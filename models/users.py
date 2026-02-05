@@ -75,7 +75,6 @@ async def modify():
 
     if not data:
         return jsonify({"error": "No data provided"}), 400  # bad request
-
     columns = ", ".join([f"{key} = ?" for key in data.keys()])
     values = list(data.values())
     uuid = data.get("uuid")
@@ -89,20 +88,16 @@ async def modify():
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
-        before = await db.execute(f"SELECT * FROM users WHERE uuid = '{uuid}'")
-        original_rows = await before.fetchall()
+        operation = await db.execute(f"UPDATE users SET {columns} WHERE uuid = '{uuid}' RETURNING *", (*values,))
 
-        operation = await db.execute(f"UPDATE users SET {columns} WHERE uuid = '{uuid}'", (*values,))
+        new_rows = await operation.fetchall()
+
         await db.commit()
-
-        after = await db.execute(f"SELECT * FROM users WHERE uuid = '{uuid}'")
-        new_rows = await after.fetchall()
-
 
         if operation.rowcount == 0:
             return jsonify({"error": "UUID not found"}), 404
 
-        await deliver("users", [dict(row) for row in new_rows], [dict(row) for row in original_rows])
+        await deliver("users", [dict(row) for row in new_rows], [])
 
 
 

@@ -5,20 +5,17 @@ from utils import path, deliver, ship
 
 punishment_blueprint = Blueprint('punishment', __name__, url_prefix = "/punishment")
 
-#
-# async def validate_user(obj : dict):
-#     # Adds the players uuid to the record if not already present
-#
-#     username = obj.get("username")
-#
-#     res = await get_user_by_username(username)
-#
-#     if res[1] < 200 or res[1] >= 300: # error code
-#         return {"message" : "system.errors.player-not-found"}
-#
-#     obj["uuid"] = res[0].get("uuid")
-#
-#     return obj
+async def get_sequence_id() -> int:
+    async with aiosqlite.connect(path) as db:
+        await db.execute("PRAGMA journal_mode=WAL;")
+        db.row_factory = aiosqlite.Row
+
+        cursor = await db.execute(f"SELECT * FROM sqlite_sequence WHERE name = 'punishments'")
+
+        res = await cursor.fetchone()
+
+        return int(res["seq"])
+
 
 @punishment_blueprint.route("/set", methods=["POST"])
 async def set():
@@ -28,10 +25,19 @@ async def set():
 
 
     punishment : dict = data.get("punishment")
-    # punishment = await validate_user(punishment)
 
     if "message" in punishment.keys():
         return {"message" : punishment.get("message")}, 400
+
+    last_id = await get_sequence_id()
+
+    reship = False
+    if punishment["id"] <= last_id:
+        punishment["id"] = last_id + 1
+        reship = True
+
+    print("punishment: " + str(punishment))
+    print("last_id: " + str(last_id))
 
     keys = []
     values = []
@@ -43,25 +49,24 @@ async def set():
         keys.append(key)
         values.append(value)
 
-    possible_id = punishment["id"]
-
 
     async with aiosqlite.connect(path) as db:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
         try:
-            query = f"INSERT INTO punishments ({', '.join(keys)}) VALUES ({('?, ' * len(values))[:-2]})"
-            print(query, values)
+            query = f"INSERT INTO punishments ({', '.join(keys)}) VALUES ({('?, ' * len(values))[:-2]}) RETURNING *"
             cursor = await db.execute(query, values,)
 
-            punishment["id"] = cursor.lastrowid
-
-            if punishment["id"] != possible_id:
-                # The game server provided us with an invalid ID, we must resend all the punishments to the game servers to ensure consistency.
-                await ship(table = "punishments")
+            new_rows = await cursor.fetchall()
 
             await db.commit()
+
+            if reship:
+                await ship("punishments")
+
+            else:
+                await deliver("punishments", new_rows, [])
 
         except aiosqlite.OperationalError as ex:
             return jsonify({"error" : str(ex)}), 500

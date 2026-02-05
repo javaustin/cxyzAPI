@@ -22,7 +22,7 @@ async def startup():
     print("Task scheduler started")
 
 async def run_cache():
-    await asyncio.gather(*(ship(p) for p in ["parties", "messages", "users", "punishments", "partyExpires", "partyInvites"]))
+    await asyncio.gather(*(ship(p) for p in ["parties", "messages", "users", "punishments", "partyExpires", "partyInvites", "friendRequests"]))
 
 async def message_deleter():
     """A task that removes any message with a timestamp older than 5 minutes."""

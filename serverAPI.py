@@ -1,6 +1,7 @@
+import random
 import time
 
-from models import messages, parties, partyInvites, partyExpires, punishment, users
+from models import messages, parties, partyInvites, partyExpires, punishment, users, friendRequests
 
 import asyncio
 import aiosqlite  # Importing aiosqlite for async database access
@@ -38,19 +39,19 @@ async def cache():
     asyncio.create_task(run_cache())
     return jsonify({"message" : "Operation successful"}), 200
 
-# @app.route("/generate_key", methods=["POST"])
-# async def generate_key():
-#     key = "".join(random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890") for _ in range(16))
-#
-#     async with aiosqlite.connect(path) as db:
-#         await db.execute("PRAGMA journal_mode=WAL;")
-#         db.row_factory = aiosqlite.Row
-#
-#         cursor = await db.cursor()
-#         await cursor.execute("INSERT INTO apiKeys (apiKey, timestamp) VALUES (?, ?)", (key, time.time().__floor__()))
-#         await db.commit()
-#
-#     return jsonify({"key": key}), 200
+@app.route("/generate_key", methods=["POST"])
+async def generate_key():
+    key = "".join(random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890") for _ in range(16))
+
+    async with aiosqlite.connect(path) as db:
+        await db.execute("PRAGMA journal_mode=WAL;")
+        db.row_factory = aiosqlite.Row
+
+        cursor = await db.cursor()
+        await cursor.execute("INSERT INTO apiKeys (apiKey, timestamp) VALUES (?, ?)", (key, time.time().__floor__()))
+        await db.commit()
+
+    return jsonify({"key": key}), 200
 
 @app.route("/sql", methods=["POST"])
 async def sql():
@@ -94,6 +95,7 @@ app.register_blueprint(partyInvites.invite_blueprint)
 app.register_blueprint(users.user_blueprint)
 app.register_blueprint(punishment.punishment_blueprint)
 app.register_blueprint(messages.message_blueprint)
+app.register_blueprint(friendRequests.friend_request_blueprint)
 print(app.url_map)
 
 if __name__ == "__main__":

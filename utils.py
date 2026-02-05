@@ -2,7 +2,13 @@ import json
 import httpx
 import aiosqlite
 
-path = "C:/Users/Austin/Documents/serverAPI/server.db"
+def get_path():
+    with open("config.json", "r") as f:
+        data = json.load(f)
+
+        return data.get("db-path")
+
+path = get_path()
 
 async def post_request(url : str, data : dict):
     try:
@@ -16,32 +22,6 @@ async def post_request(url : str, data : dict):
         print(f"❌ POST request sent to {url} failed with an exception! {ex}")
         return None
 
-
-# user info of a single user
-async def get_user(uuid):  # user info of a single user
-    async with aiosqlite.connect(path) as db:
-        db.row_factory = aiosqlite.Row
-
-        cursor = await db.execute("SELECT * FROM users WHERE uuid = ?", (uuid,))
-        row = await cursor.fetchone()
-
-    if row is None:
-        return {"error": "UUID not found"}, 404
-        # This is an error because a UUID cannot simply be misspelt by a player. It is only in code.
-
-    return dict(row), 200
-
-async def get_user_by_username(username):  # user info of a single user
-    async with aiosqlite.connect(path) as db:
-        db.row_factory = aiosqlite.Row
-
-        cursor = await db.execute("SELECT * FROM users WHERE username = ?", (username,))
-        row = await cursor.fetchone()
-
-    if row is None:
-        return {"message": "Player not found!"}, 404
-
-    return dict(row), 200
 
 async def is_authenticated(key):
     async with aiosqlite.connect(path) as db:
@@ -63,7 +43,7 @@ async def ship(table : str = "users"):
 
         res = await cursor.fetchall()
 
-        with open("servers.json", "r") as f:
+        with open("config.json", "r") as f:
             data = json.load(f)
 
         servers = data.get("servers", {})
@@ -74,7 +54,7 @@ async def ship(table : str = "users"):
 async def deliver(table : str, new_rows : list, old_rows : list):
     # Sends a json copy of any updated rows to all game servers.
 
-    with open("servers.json", "r") as f:
+    with open("config.json", "r") as f:
         data = json.load(f)
 
     servers = data.get("servers", {})

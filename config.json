@@ -1,0 +1,6 @@
+{
+  "db-path" : "C:/Users/ayoung9/Documents/dev/cxyzAPI/server.db",
+  "servers" : {
+    "HUB-1" : "http://localhost:59152"
+  }
+}
