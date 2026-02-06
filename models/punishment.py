@@ -136,7 +136,7 @@ async def edit():
             if operation.rowcount == 0:
                 return {"message" : "system.errors.args.missing-case"}, 404
 
-            await deliver("punishments", [dict(row) for row in new_rows], [dict(row) for row in original_rows])
+            await deliver("punishments", [dict(row) for row in new_rows], [])
 
             await db.commit()
 
@@ -144,6 +144,33 @@ async def edit():
             return jsonify({"error" : str(ex)}), 500
 
         return jsonify({"message" : "Operation successful!", "punishment" : punishment}), 200
+
+@punishment_blueprint.route("/clear", methods=["POST"])
+async def clear():
+
+    data = await request.get_json()
+    uuid : str = data.get("uuid")
+
+    if not uuid:
+        return jsonify({"message": "uuid cannot be null"}), 400
+
+    async with aiosqlite.connect(path) as db:
+        await db.execute("PRAGMA journal_mode=WAL;")
+        db.row_factory = aiosqlite.Row
+
+        try:
+            operation = await db.execute("DELETE FROM punishments WHERE uuid = ? RETURNING *", (uuid,))
+
+            deleted_rows = await operation.fetchall()
+
+            await deliver("punishments", [], [dict(row) for row in deleted_rows])
+
+            await db.commit()
+
+        except aiosqlite.OperationalError as ex:
+            return jsonify({"error" : str(ex)}), 500
+
+        return jsonify({"message" : "Operation successful!"}), 200
 
 
 __all__ = ["punishment_blueprint"]
