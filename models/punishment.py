@@ -30,6 +30,7 @@ async def set():
         return {"message" : punishment.get("message")}, 400
 
     last_id = await get_sequence_id()
+    
 
     reship = False
     if punishment["id"] <= last_id:

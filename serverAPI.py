@@ -99,4 +99,4 @@ app.register_blueprint(friendRequests.friend_request_blueprint)
 print(app.url_map)
 
 if __name__ == "__main__":
-    app.run(port = 5000, debug = False, use_reloader = False)
+    app.run(port = 5000, debug = True, use_reloader = False)

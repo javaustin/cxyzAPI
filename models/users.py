@@ -1,7 +1,6 @@
 from quart import request, jsonify, Blueprint
 import aiosqlite
 
-import utils
 from utils import path, deliver
 
 user_blueprint = Blueprint('user', __name__, url_prefix = "/user")
@@ -75,12 +74,18 @@ async def modify():
 
     if not data:
         return jsonify({"error": "No data provided"}), 400  # bad request
+
     columns = ", ".join([f"{key} = ?" for key in data.keys()])
     values = list(data.values())
     uuid = data.get("uuid")
+    version = data.get("version")
 
     if not uuid:
         return jsonify({"error": "user must have a uuid"}), 400 # Add uuid to the end of the values list for the WHERE clause
+
+    if version is None:
+        return jsonify({"error": "user must have a version"}), 400 # Add uuid to the end of the values list for the WHERE clause
+
 
     print("user/modify (data): " + str(data))
 
@@ -88,14 +93,14 @@ async def modify():
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
-        operation = await db.execute(f"UPDATE users SET {columns} WHERE uuid = '{uuid}' RETURNING *", (*values,))
+        operation = await db.execute(f"UPDATE users SET {columns} WHERE uuid = '{uuid}' AND version <= {version} RETURNING *", (*values,))
 
         new_rows = await operation.fetchall()
 
         await db.commit()
 
         if operation.rowcount == 0:
-            return jsonify({"error": "UUID not found"}), 404
+            return jsonify({"error": "No rows affected on SQL operation. Either the uuid is invalid or the object version is not synced."}), 404
 
         await deliver("users", [dict(row) for row in new_rows], [])
 
