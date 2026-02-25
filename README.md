@@ -5,9 +5,6 @@ An async [quart](https://quart.palletsprojects.com/en/latest/) based API to writ
 - This API is built to supplment the Spigot plugin CXYZ. You can view it [here](https://github.com/javaustin/CXYZ).  
 - This project is IN PROGRESS as of February 2026. Please do not expect support as the project has not reached a finalized state.
 
-#### Project Notes
-- Note we use the term plugin and server interchangibly. "Plugin" refers to the Minecraft plugin that runs on the Minecraft server. "Server" just refers to a server a plugin runs on.
-
 ---
 
 ## Outline
@@ -77,3 +74,5 @@ The plugin ONLY accepts requests on the port it defined in config.yml. Do not us
 - Plugin verifies data (version #, GSON verifies schema)
 - Plugin simply copies the payload provided to its internal memory and logs the action
 - Plugin also recieves POSTs of server actions (e.g. /kick, /sendMessage) that must be initialized server to server.
+
+> Note we use the term plugin and server interchangibly. "Plugin" refers to the Minecraft plugin that runs on the Minecraft server. "Server" just refers to a server a plugin runs on.
