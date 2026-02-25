@@ -1,19 +1,31 @@
+import base64
+import hashlib
+import hmac
 import json
 import httpx
 import aiosqlite
 
-def get_path():
+from other.servers import Server
+
+
+class DeliveryService:
+    is_delivering = False
+    tables = ["parties", "messages", "users", "punishments", "partyExpires", "partyInvites", "friendRequests"]
+
+
+def get(key : str):
     with open("config.json", "r") as f:
         data = json.load(f)
 
-        return data.get("db-path")
+        return data.get(key)
 
-path = get_path()
+path = get("db-path")
+api_key = get("api-key")
 
 async def post_request(url : str, data : dict):
     try:
         async with httpx.AsyncClient() as client:
-            await client.post(url, json = data, headers = {'content-type' : "application/json"})
+            await client.post(url, json = data, headers = {'content-type' : "application/json"}, timeout = 5.0)
 
             print(f"✅ POST request sent to {url} completed.")
             return None
@@ -21,17 +33,6 @@ async def post_request(url : str, data : dict):
     except Exception as ex:
         print(f"❌ POST request sent to {url} failed with an exception! {ex}")
         return None
-
-
-async def is_authenticated(key):
-    async with aiosqlite.connect(path) as db:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
-
-        cursor = await db.execute("SELECT * from apiKeys WHERE apiKey = ?", (key,))
-        row = await cursor.fetchone()
-        return row is not None
-
 
 async def ship(table : str = "users"):
     # Sends a json copy of an entire table to all game servers.
@@ -46,10 +47,8 @@ async def ship(table : str = "users"):
         with open("config.json", "r") as f:
             data = json.load(f)
 
-        servers = data.get("servers", {})
-
-        for name, ip in servers.items():
-            await post_request(f"{ip}/{table}Shipment", {"data" : [dict(row) for row in res]})
+        for server in Server.servers:
+            await post_request(f"{server.ip}/{table}Shipment", {"data" : [dict(row) for row in res]})
 
 async def deliver(table : str, new_rows : list, old_rows : list):
     # Sends a json copy of any updated rows to all game servers.
@@ -57,13 +56,26 @@ async def deliver(table : str, new_rows : list, old_rows : list):
     with open("config.json", "r") as f:
         data = json.load(f)
 
-    servers = data.get("servers", {})
-
-    for name, ip in servers.items():
+    for server in Server.servers:
         await post_request(
-            f"{ip}/{table}Delivery",
+            f"{server.ip}/{table}Delivery",
             {
                 "new_data": [row for row in new_rows],
                 "old_data": [row for row in old_rows]
             }
         )
+
+def generate_signature(identifier : str, secret : str, timestamp : int, method : str, path : str, payload_json : str):
+    if payload_json is None:
+        payload_json = ""
+
+    message = identifier + "\n" + str(timestamp) + "\n" + method + "\n" + path + "\n" + payload_json
+
+    mac = hmac.new(secret.encode("utf-8"), message.encode("utf-8"), hashlib.sha256())
+
+    signature = base64.b64encode(mac.digest())
+
+    return signature
+
+
+# def authenticate_request():

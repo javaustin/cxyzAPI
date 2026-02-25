@@ -1,7 +1,9 @@
 import aiosqlite
 from quart import request, jsonify, Blueprint
 
-from utils import path, deliver, ship
+from other.utils import path, deliver, ship
+
+print(f"loaded {__name__} routes")
 
 punishment_blueprint = Blueprint('punishment', __name__, url_prefix = "/punishment")
 

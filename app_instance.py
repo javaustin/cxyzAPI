@@ -4,4 +4,4 @@ from quart import Quart
 app = Quart(__name__)
 scheduler = AsyncIOScheduler()
 
-print("app_instance.py loaded!")
+print("Running app...")

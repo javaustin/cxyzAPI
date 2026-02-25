@@ -1,9 +1,9 @@
 import aiosqlite
 from quart import request, jsonify, Blueprint
 
-from utils import path, deliver
+from other.utils import path, deliver
 
-print("partyExpire routes loaded!")
+print(f"loaded {__name__} routes")
 
 expire_blueprint = Blueprint('partyExpire', __name__, url_prefix = "/partyExpire")
 

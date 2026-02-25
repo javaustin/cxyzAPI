@@ -75,4 +75,4 @@ The plugin ONLY accepts requests on the port it defined in config.yml. Do not us
 - Plugin simply copies the payload provided to its internal memory and logs the action
 - Plugin also recieves POSTs of server actions (e.g. /kick, /sendMessage) that must be initialized server to server.
 
-> Note we use the term plugin and server interchangibly. "Plugin" refers to the Minecraft plugin that runs on the Minecraft server. "Server" just refers to a server a plugin runs on.
+> Note we use the term plugin and server interchangeably. "Plugin" refers to the Minecraft plugin that runs on the Minecraft server. "Server" just refers to a server a plugin runs on.

@@ -1,10 +1,11 @@
 from quart import request, jsonify, Blueprint
 import aiosqlite
 
-from utils import path, deliver
+from other.utils import path, deliver
+
+print(f"loaded {__name__} routes")
 
 user_blueprint = Blueprint('user', __name__, url_prefix = "/user")
-
 
 @user_blueprint.route("/create", methods=["POST"])
 async def create():

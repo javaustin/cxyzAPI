@@ -1,9 +1,9 @@
 import aiosqlite
 from quart import request, jsonify, Blueprint
 
-from utils import path, deliver
+from other.utils import path, deliver
 
-print("friendRequests routes loaded!")
+print(f"loaded {__name__} routes")
 
 friend_request_blueprint = Blueprint('friendRequest', __name__, url_prefix = "/friendRequest")
 
