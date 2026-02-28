@@ -53,3 +53,7 @@ class Server:
                 return server
 
         return None
+
+
+    def __str__(self) -> str:
+        return self.identifier + self.ip + self.secret

@@ -22,12 +22,7 @@ async def startup():
     print("Task scheduler started")
 
 async def run_cache(tables : list):
-
-    DeliveryService.is_delivering = True
-
-    await asyncio.gather(*(ship(p) for p in tables)) # await actually awaits the code! who knew?
-
-    DeliveryService.is_delivering = False
+    await asyncio.gather(*(ship(p) for p in tables))
 
 
 async def message_deleter():

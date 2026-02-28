@@ -1,14 +1,14 @@
 {
   "API" : {
     "ip-address" : "http://localhost:5000",
-    "secret" : "dgKP3ykuSXviIljh"
+    "secret" : "super-secret-key-1"
   },
 
   "db-path" : "C:/Users/ayoung9/Documents/dev/cxyzAPI/server.db",
   "servers" : {
     "HUB-1" : {
       "ip-address": "http://localhost:59152",
-      "secret": "OJpON-h13es0M0GhN1Ld6A"
+      "secret": "super-secret-key-2"
     }
   }
 }
