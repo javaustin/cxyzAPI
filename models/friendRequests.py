@@ -11,17 +11,20 @@ friend_request_blueprint = Blueprint('friendRequest', __name__, url_prefix = "/f
 async def create():
     data = await request.get_json()
 
-    inviter = data.get("inviter")
+    sender = data.get("sender")
     recipient = data.get("recipient")
     expire_timestamp = data.get("expireTimestamp")
+
+    if not all([sender, recipient, expire_timestamp]):
+        return jsonify({"error": "sender, recipient, expire_timestamp is required"}), 400
 
     async with aiosqlite.connect(path) as db:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
-        after = await db.execute("INSERT INTO friendRequests (inviter, recipient, expireTimestamp) VALUES (?, ?, ?) RETURNING *", (inviter, recipient, expire_timestamp,))
+        operation = await db.execute("INSERT INTO friendRequests (sender, recipient, expireTimestamp) VALUES (?, ?, ?) RETURNING *", (sender, recipient, expire_timestamp,))
 
-        after_rows = [dict(row) for row in await after.fetchall()]
+        after_rows = [dict(row) for row in await operation.fetchall()]
 
         await deliver("friendRequests", after_rows, [])
 
@@ -34,14 +37,14 @@ async def create():
 async def delete():
     data = await request.get_json()
 
-    inviter = data.get("inviter")
+    sender = data.get("sender")
     recipient = data.get("recipient")
 
     async with aiosqlite.connect(path) as db:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
-        cursor = await db.execute("DELETE FROM friendRequests WHERE inviter = ? AND recipient = ? RETURNING *", (inviter, recipient))
+        cursor = await db.execute("DELETE FROM friendRequests WHERE sender = ? AND recipient = ? RETURNING *", (sender, recipient))
 
         await deliver("partyInvites", [], [dict(row) for row in await cursor.fetchall()])
 

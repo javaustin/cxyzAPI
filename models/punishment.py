@@ -39,9 +39,6 @@ async def set():
         punishment["id"] = last_id + 1
         reship = True
 
-    print("punishment: " + str(punishment))
-    print("last_id: " + str(last_id))
-
     keys = []
     values = []
 

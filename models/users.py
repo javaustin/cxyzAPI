@@ -81,11 +81,16 @@ async def modify():
     uuid = data.get("uuid")
     version = data.get("version")
 
+    try:
+        version = int(version)
+    except ValueError:
+        return jsonify({"error" : "version must be an integer"}), 400
+
     if not uuid:
-        return jsonify({"error": "user must have a uuid"}), 400 # Add uuid to the end of the values list for the WHERE clause
+        return jsonify({"error": "user must have a uuid"}), 400
 
     if version is None:
-        return jsonify({"error": "user must have a version"}), 400 # Add uuid to the end of the values list for the WHERE clause
+        return jsonify({"error": "user must have a version"}), 400
 
 
     print("user/modify (data): " + str(data))
@@ -94,7 +99,7 @@ async def modify():
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
-        operation = await db.execute(f"UPDATE users SET {columns} WHERE uuid = '{uuid}' AND version <= {version} RETURNING *", (*values,))
+        operation = await db.execute(f"UPDATE users SET {columns} WHERE uuid = '{uuid}' AND version < {version} RETURNING *", (*values,))
 
         new_rows = await operation.fetchall()
 

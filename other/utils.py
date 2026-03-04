@@ -15,7 +15,7 @@ from other.servers import Server
 
 class DeliveryService:
     is_delivering = False
-    tables = ["parties", "messages", "users", "punishments", "partyExpires", "partyInvites", "friendRequests"]
+    tables = ["parties", "messages", "users", "punishments", "partyExpires", "partyInvites", "friendRequests", "gameStats"]
 
 
 def get(key : str):
