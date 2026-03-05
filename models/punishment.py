@@ -108,33 +108,30 @@ async def edit():
     data = await request.get_json()
 
     punishment : dict = data.get("punishment")
-    id = punishment.get("id")
+    case_id = punishment.get("id")
 
-    if not id:
+    if not case_id:
         return jsonify({"message": "id cannot be null"}), 400
 
     if punishment is None:
-        return {"message": "system.errors.args.missing-case"}, 404
+        return {"message": f"punishment with id={case_id} can't be found"}, 404
 
     columns = ', '.join([f"{key} = ?" for key in punishment])
     values = list(punishment.values())
 
-    query = f"UPDATE punishments SET {columns} WHERE id = {id}"
+    query = f"UPDATE punishments SET {columns} WHERE id = {case_id}"
 
     async with aiosqlite.connect(path) as db:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
         try:
-            before = await db.execute(f"SELECT * FROM punishments WHERE id = {id}")
-            original_rows = await before.fetchall()
-
             operation = await db.execute(query, values)
 
             new_rows = await operation.fetchall()
 
-            if operation.rowcount == 0:
-                return {"message" : "system.errors.args.missing-case"}, 404
+            if len(new_rows) == 0:
+                return jsonify({"message": "No row found"}), 404
 
             await deliver("punishments", [dict(row) for row in new_rows], [])
 

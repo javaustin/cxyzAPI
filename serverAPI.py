@@ -99,7 +99,7 @@ async def seq(table):
             return jsonify({"seq": int(res["seq"])}), 200
 
         else:
-            return jsonify({"error": f"Table '{table}' does not exist!"}), 404
+            return jsonify({"seq": 0}), 200
 
 
 Server.load_servers()

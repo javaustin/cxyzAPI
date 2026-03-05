@@ -46,7 +46,7 @@ async def delete():
 
         cursor = await db.execute("DELETE FROM friendRequests WHERE sender = ? AND recipient = ? RETURNING *", (sender, recipient))
 
-        await deliver("partyInvites", [], [dict(row) for row in await cursor.fetchall()])
+        await deliver("friendRequests", [], [dict(row) for row in await cursor.fetchall()])
 
         await db.commit()
         return jsonify({"message": "Operation successful."}), 200
