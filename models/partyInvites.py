@@ -1,6 +1,7 @@
 import aiosqlite
 from quart import request, jsonify, Blueprint
 
+import app_instance
 from other.utils import path, deliver
 
 print(f"loaded {__name__} routes")
@@ -15,7 +16,9 @@ async def create():
     recipient = data.get("recipient")
     expire_timestamp = data.get("expireTimestamp")
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
@@ -29,6 +32,9 @@ async def create():
 
         return jsonify({"message": "Operation successful."}), 200
 
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error", str(ex)}), 500
+
 
 @invite_blueprint.route("/sync", methods=["POST"])
 async def sync():
@@ -38,7 +44,9 @@ async def sync():
     recipient = data.get("recipient")
     expire_timestamp = data.get("expireTimestamp")
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
@@ -53,6 +61,10 @@ async def sync():
         return jsonify({"message": "Operation successful."}), 200
 
 
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error", str(ex)}), 500
+
+
 @invite_blueprint.route("/delete", methods=["POST"])
 async def delete():
     data = await request.get_json()
@@ -60,7 +72,9 @@ async def delete():
     inviter = data.get("inviter")
     recipient = data.get("recipient")
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
@@ -70,6 +84,11 @@ async def delete():
 
         await db.commit()
         return jsonify({"message": "Operation successful."}), 200
+
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error", str(ex)}), 500
+
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 __all__ = ["invite_blueprint"]

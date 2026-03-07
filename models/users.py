@@ -1,6 +1,7 @@
 from quart import request, jsonify, Blueprint
 import aiosqlite
 
+import app_instance
 from other.utils import path, deliver
 
 print(f"loaded {__name__} routes")
@@ -20,27 +21,31 @@ async def create():
     placeholders = ', '.join(['?'] * len(data.keys()))
     values = tuple(data.values())
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
-        try:
-            before = await db.execute(f"SELECT * FROM users WHERE uuid = ?", (uuid,))
-            original_rows = await before.fetchall()
 
-            if len(original_rows) > 0:
-                return jsonify({"error": "duplicate uuids"}), 400
+        before = await db.execute(f"SELECT * FROM users WHERE uuid = ?", (uuid,))
 
-            cursor = await db.execute(f"INSERT INTO users ({columns}) VALUES ({placeholders}) RETURNING *", values)
-            new_rows = await cursor.fetchall()
+        if before.rowcount > 0:
+            return jsonify({"error": "duplicate uuids"}), 400
 
-            await db.commit()
+        cursor = await db.execute(f"INSERT INTO users ({columns}) VALUES ({placeholders}) RETURNING *", values)
+        new_rows = await cursor.fetchall()
 
-        except Exception as ex:
-                return jsonify({"error" : ex}), 500
+        await db.commit()
 
         await deliver("users", [dict(row) for row in new_rows], [])
 
-    return jsonify({"message": "Operation successful.", "uuid": uuid}), 200
+        return jsonify({"message": "Operation successful.", "uuid": uuid}), 200
+
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : ex}), 500
+
+
 
 @user_blueprint.route("/delete", methods=["POST"])  # similar to get request
 async def delete():
@@ -52,19 +57,26 @@ async def delete():
     if not uuid:
         return jsonify({"message", "bruh"}), 404
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
         cursor = await db.execute(f"DELETE FROM users WHERE uuid = ? RETURNING *", (uuid,))
-        if cursor.rowcount == 0:
-            return jsonify({"error": "No user found", "uuid": uuid}), 404
 
         new_rows = await cursor.fetchall()
+
+        if len(new_rows) == 0:
+            return jsonify({"error": "No user found", "uuid": uuid}), 404
+
 
         await db.commit()
 
         await deliver("users", [], [dict(row) for row in new_rows])
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : ex}), 500
 
 
     return jsonify({"message": "Operation successful.", "uuid": uuid}), 200
@@ -95,7 +107,9 @@ async def modify():
 
     print("user/modify (data): " + str(data))
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
@@ -105,10 +119,13 @@ async def modify():
 
         await db.commit()
 
-        if operation.rowcount == 0:
+        if len(new_rows) == 0:
             return jsonify({"error": "No rows affected on SQL operation. Either the uuid is invalid or the object version is not synced."}), 404
 
         await deliver("users", [dict(row) for row in new_rows], [])
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : ex}), 500
 
 
 

@@ -1,6 +1,7 @@
 import aiosqlite
 from quart import request, jsonify, Blueprint
 
+import app_instance
 from other.utils import path, deliver, ship
 
 print(f"loaded {__name__} routes")
@@ -8,15 +9,19 @@ print(f"loaded {__name__} routes")
 punishment_blueprint = Blueprint('punishment', __name__, url_prefix = "/punishment")
 
 async def get_sequence_id() -> int:
-    async with aiosqlite.connect(path) as db:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
+    db = app_instance.db
 
-        cursor = await db.execute(f"SELECT * FROM sqlite_sequence WHERE name = 'punishments'")
+    await db.execute("PRAGMA journal_mode=WAL;")
+    db.row_factory = aiosqlite.Row
 
-        res = await cursor.fetchone()
+    cursor = await db.execute(f"SELECT * FROM sqlite_sequence WHERE name = 'punishments'")
 
+    res = await cursor.fetchone()
+
+    if res is not None:
         return int(res["seq"])
+
+    return 0
 
 
 @punishment_blueprint.route("/set", methods=["POST"])
@@ -50,28 +55,30 @@ async def set():
         values.append(value)
 
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
-        try:
-            query = f"INSERT INTO punishments ({', '.join(keys)}) VALUES ({('?, ' * len(values))[:-2]}) RETURNING *"
-            cursor = await db.execute(query, values,)
+        query = f"INSERT INTO punishments ({', '.join(keys)}) VALUES ({('?, ' * len(values))[:-2]}) RETURNING *"
+        cursor = await db.execute(query, values,)
 
-            new_rows = await cursor.fetchall()
+        new_rows = await cursor.fetchall()
 
-            await db.commit()
+        await db.commit()
 
-            if reship:
-                await ship("punishments")
+        if reship:
+            await ship("punishments")
 
-            else:
-                await deliver("punishments", new_rows, [])
+        else:
+            await deliver("punishments", new_rows, [])
 
-        except aiosqlite.OperationalError as ex:
-            return jsonify({"error" : str(ex)}), 500
+        return jsonify({"message": "Operation successful!", "punishment": punishment}), 200
 
-        return jsonify({"message" : "Operation successful!", "punishment" : punishment}), 200
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : str(ex)}), 500
 
 
 @punishment_blueprint.route("/delete", methods = ["POST"])
@@ -80,25 +87,27 @@ async def delete():
 
     id = data.get("id")
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
         punishment = {}
 
-        try:
-            cursor = await db.execute(f"DELETE FROM punishments WHERE id = {id} RETURNING *")
-            deleted_rows = await cursor.fetchall()
+        cursor = await db.execute(f"DELETE FROM punishments WHERE id = {id} RETURNING *")
+        deleted_rows = await cursor.fetchall()
 
-            await deliver("punishments", [], [dict(row) for row in deleted_rows])
-            # The plugin will remove the old rows (or single row in this case, and not add any new ones, since that argument is left blank)
 
-            await db.commit()
+        await deliver("punishments", [], [dict(row) for row in deleted_rows])
+        # The plugin will remove the old rows (or single row in this case, and not add any new ones, since that argument is left blank)
 
-        except aiosqlite.OperationalError as ex:
-            return jsonify({"error" : str(ex)}), 500
+        await db.commit()
 
-        return jsonify({"message" : "Operation successful!", "punishment" : punishment}), 200
+        return jsonify({"message": "Operation successful!", "punishment": punishment}), 200
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : str(ex)}), 500
 
 
 @punishment_blueprint.route("/edit", methods=["POST"])
@@ -121,26 +130,27 @@ async def edit():
 
     query = f"UPDATE punishments SET {columns} WHERE id = {case_id}"
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
-        try:
-            operation = await db.execute(query, values)
+        operation = await db.execute(query, values)
 
-            new_rows = await operation.fetchall()
+        new_rows = await operation.fetchall()
 
-            if len(new_rows) == 0:
-                return jsonify({"message": "No row found"}), 404
+        if len(new_rows) == 0:
+            return jsonify({"message": "No row found"}), 404
 
-            await deliver("punishments", [dict(row) for row in new_rows], [])
+        await deliver("punishments", [dict(row) for row in new_rows], [])
 
-            await db.commit()
+        await db.commit()
 
-        except aiosqlite.OperationalError as ex:
-            return jsonify({"error" : str(ex)}), 500
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : str(ex)}), 500
 
-        return jsonify({"message" : "Operation successful!", "punishment" : punishment}), 200
+    return jsonify({"message" : "Operation successful!", "punishment" : punishment}), 200
 
 @punishment_blueprint.route("/clear", methods=["POST"])
 async def clear():
@@ -151,23 +161,24 @@ async def clear():
     if not uuid:
         return jsonify({"message": "uuid cannot be null"}), 400
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
-        try:
-            operation = await db.execute("DELETE FROM punishments WHERE uuid = ? RETURNING *", (uuid,))
+        operation = await db.execute("DELETE FROM punishments WHERE uuid = ? RETURNING *", (uuid,))
 
-            deleted_rows = await operation.fetchall()
+        deleted_rows = await operation.fetchall()
 
-            await deliver("punishments", [], [dict(row) for row in deleted_rows])
+        await deliver("punishments", [], [dict(row) for row in deleted_rows])
 
-            await db.commit()
-
-        except aiosqlite.OperationalError as ex:
-            return jsonify({"error" : str(ex)}), 500
-
+        await db.commit()
         return jsonify({"message" : "Operation successful!"}), 200
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : str(ex)}), 500
+
 
 
 __all__ = ["punishment_blueprint"]

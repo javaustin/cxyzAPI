@@ -1,7 +1,8 @@
 from quart import request, jsonify, Blueprint
 import aiosqlite
 
-from other.utils import path, deliver
+import app_instance
+from other.utils import deliver
 
 print(f"loaded {__name__} routes")
 
@@ -26,7 +27,9 @@ async def submit():
     columns = ", ".join(data.keys())
     values = list(data.values())
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
@@ -43,6 +46,9 @@ async def submit():
 
         return jsonify({"message": "Operation successful.", "message_data": data}), 200
     # sender_uuid, sender_name, recipient_uuid, recipient_name, content, timestamp
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error", str(ex)}), 500
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #

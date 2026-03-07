@@ -1,6 +1,7 @@
 import aiosqlite
 from quart import request, jsonify, Blueprint
 
+import app_instance
 from other.utils import path, deliver
 
 print(f"loaded {__name__} routes")
@@ -22,14 +23,15 @@ async def create():
     if not sender_uuid:
         return jsonify({"error": "uuid is required"}), 400
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL")
         db.row_factory = aiosqlite.Row
 
         before = await db.execute(f"SELECT * FROM parties WHERE ownerUUID = ?", (sender_uuid,))
-        original_rows = await before.fetchall()
 
-        if len(original_rows) > 0:
+        if before.rowcount > 0:
             return jsonify({"error": "duplicate uuids"}), 400
 
         after = await db.execute("INSERT INTO parties (ownerUUID, players, public) VALUES (?, ?, ?) RETURNING *", (sender_uuid, players, public,))
@@ -41,6 +43,9 @@ async def create():
         await db.commit()
 
         return jsonify({"message": "Operation successful."}), 200
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error", str(ex)}), 500
 
 
 @party_blueprint.route("/sync", methods=["POST"])
@@ -54,7 +59,9 @@ async def sync():
     if not sender_uuid:
         return jsonify({"error": "uuid is required"}), 400
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
@@ -68,13 +75,19 @@ async def sync():
 
         return jsonify({"message": "Operation successful."}), 200
 
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error", str(ex)}), 500
+
+
 @party_blueprint.route("/delete", methods=["POST"])
 async def delete():
     data = await request.get_json()
 
     sender_uuid = data.get("sender_uuid")
 
-    async with aiosqlite.connect(path) as db:
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
@@ -85,6 +98,11 @@ async def delete():
         await db.commit()
 
         return jsonify({"message": "Operation successful."}), 200
+
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error", str(ex)}), 500
+
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 __all__ = ["party_blueprint"]

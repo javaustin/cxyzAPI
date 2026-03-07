@@ -1,7 +1,8 @@
 import aiosqlite
 from quart import request, jsonify, Blueprint
 
-from other.utils import path, deliver
+import app_instance
+from other.utils import deliver
 
 print(f"loaded {__name__} routes")
 
@@ -18,7 +19,9 @@ async def create():
     if not all([sender, recipient, expire_timestamp]):
         return jsonify({"error": "sender, recipient, expire_timestamp is required"}), 400
 
-    async with aiosqlite.connect(path) as db:
+    try:
+        db = app_instance.db
+
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
@@ -32,6 +35,9 @@ async def create():
 
         return jsonify({"message": "Operation successful."}), 200
 
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error", str(ex)}), 500
+
 
 @friend_request_blueprint.route("/delete", methods=["POST"])
 async def delete():
@@ -40,7 +46,9 @@ async def delete():
     sender = data.get("sender")
     recipient = data.get("recipient")
 
-    async with aiosqlite.connect(path) as db:
+    try:
+        db = app_instance.db
+
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
@@ -50,6 +58,9 @@ async def delete():
 
         await db.commit()
         return jsonify({"message": "Operation successful."}), 200
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error", str(ex)}), 500
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 __all__ = ["friend_request_blueprint"]

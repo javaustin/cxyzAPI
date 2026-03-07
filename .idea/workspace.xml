@@ -6,9 +6,20 @@
   <component name="ChangeListManager">
     <list default="true" id="5abbb016-b73f-46dd-ba38-a51537f89c23" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app_instance.py" beforeDir="false" afterPath="$PROJECT_DIR$/app_instance.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/friendRequests.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/friendRequests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/gameStats.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/gameStats.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/messages.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/messages.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/parties.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/parties.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/partyExpires.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/partyExpires.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/partyInvites.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/partyInvites.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/punishment.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/punishment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/users.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/other/tasks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/other/utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server.db" beforeDir="false" afterPath="$PROJECT_DIR$/server.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.db-shm" beforeDir="false" afterPath="$PROJECT_DIR$/server.db-shm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.db-wal" beforeDir="false" afterPath="$PROJECT_DIR$/server.db-wal" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/serverAPI.py" beforeDir="false" afterPath="$PROJECT_DIR$/serverAPI.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

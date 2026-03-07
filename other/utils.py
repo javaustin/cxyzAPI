@@ -9,6 +9,7 @@ import httpx
 import aiosqlite
 import quart.app
 
+import app_instance
 from other.errors import AuthenticationFailException
 from other.servers import Server
 
@@ -67,7 +68,10 @@ async def post_request(url : str, data : dict):
 
 async def ship(table : str = "users"):
     # Sends a json copy of an entire table to all game servers.
-    async with aiosqlite.connect(path) as db:
+
+    db = app_instance.db
+
+    try:
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
@@ -75,23 +79,31 @@ async def ship(table : str = "users"):
 
         res = await cursor.fetchall()
 
-        with open("config.json", "r") as f:
-            data = json.load(f)
-
         for server in Server.servers:
             await post_request(f"{server.ip}/{table}Shipment", {"data" : [dict(row) for row in res]})
 
+    except Exception as ex:
+        print(f"ship exception: {ex}")
+
 async def deliver(table : str, new_rows : list, old_rows : list):
     # Sends a json copy of any updated rows to all game servers.
+
+    new_data = [dict(row) for row in new_rows]
+    old_data = [dict(row) for row in old_rows]
+
+    if len(new_data) == 0 and len(old_data) == 0:
+        return None
 
     for server in Server.servers:
         await post_request(
             f"{server.ip}/{table}Delivery",
             {
-                "new_data": [dict(row) for row in new_rows],
-                "old_data": [dict(row) for row in old_rows]
+                "new_data": new_data,
+                "old_data": old_data
             }
         )
+
+    return None
 
 def generate_signature(identifier : str, secret : str, timestamp : int, method : str, urlpath : str, payload_json : str):
     if payload_json is None:
@@ -103,12 +115,11 @@ def generate_signature(identifier : str, secret : str, timestamp : int, method :
 
     signature = base64.b64encode(mac.digest()).decode('utf-8')
 
-    # print("Generating signature with: " + message + "\n\tSignature: " + signature)
-
     return signature
 
 
 async def authenticate_request(request : quart.app.Request):
+
     data = await request.get_data(as_text = True)
 
     payload : str = data
@@ -152,7 +163,7 @@ async def authenticate_request(request : quart.app.Request):
     )
 
     if not hmac.compare_digest(signature, local_signature):
-        print(signature + " != " + local_signature)
         raise AuthenticationFailException("Signature is invalid.")
+
 
     return None
