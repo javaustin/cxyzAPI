@@ -1,8 +1,8 @@
 import json
 
 class Server:
-    servers : list[Server] = []
-    api : Server = None
+    servers : list["Server"] = []
+    api : "Server" = None
 
 
     def __init__(self, identifier, ip, secret):
@@ -41,10 +41,9 @@ class Server:
                 raise RuntimeError("Missing API server data")
 
             identifier = "API"
-            ip = data[identifier]["ip-address"]
             secret = data[identifier]["secret"]
 
-            Server.api = Server(identifier, ip, secret)
+            Server.api = Server(identifier, "0.0.0.0", secret)
 
     @staticmethod
     def get_server(identifier):

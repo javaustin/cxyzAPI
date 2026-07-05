@@ -2,3 +2,6 @@
 /__pycache__/
 .gitignore
 server.db
+__pycache__/
+*.pyc
+/scripts/

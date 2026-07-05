@@ -1,10 +1,13 @@
 {
+  "db-path" : "/home/austin/Documents/dev/cxyzAPI/server.db",
+
+  "quart-host" : "0.0.0.0",
+  "quart-port" : 5000,
+
   "API" : {
-    "ip-address" : "http://localhost:5000",
     "secret" : "super-secret-key-1"
   },
 
-  "db-path" : "C:/Users/ayoung9/Documents/dev/cxyzAPI/server.db",
   "servers" : {
     "HUB-1" : {
       "ip-address": "http://localhost:59152",

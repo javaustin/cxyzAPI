@@ -1,0 +1,4 @@
+aiosqlite~=0.22.1
+httpx~=0.28.1
+Quart~=0.20.0
+APScheduler~=3.11.2

@@ -13,7 +13,6 @@ async def set():
     data = await request.get_json()
 
     uuid = data.get("uuid")
-    gameID = data.get("gameID")
     statID = data.get("statID")
     value = data.get("value")
     version = data.get("version")
@@ -27,8 +26,8 @@ async def set():
 
     print("version: " + str(version))
 
-    if not all([uuid, gameID, statID, value, version]):
-        return jsonify({"error": "uuid, gameID, statID, value, version are required"}), 400
+    if not all([uuid, statID, value, version]):
+        return jsonify({"error": "uuid,  statID, value, version are required"}), 400
 
     db = app_instance.db
 
@@ -36,20 +35,20 @@ async def set():
         await db.execute("PRAGMA journal_mode=WAL;")
         db.row_factory = aiosqlite.Row
 
-        existing = await db.execute("SELECT * FROM gameStats WHERE uuid = ? AND gameID = ? AND statID = ?", (uuid, gameID, statID,))
+        existing = await db.execute("SELECT * FROM gameStats WHERE uuid = ? AND statID = ?", (uuid, statID,))
 
         rows = await existing.fetchall()
 
         if len(rows) == 0:
             operation = await db.execute(
-                f"INSERT INTO gameStats (uuid, gameID, statID, value, version) VALUES (?, ?, ?, ?, ?) RETURNING *",
-                (uuid, gameID, statID, value, version,)
+                f"INSERT INTO gameStats (uuid, statID, value, version) VALUES (?, ?, ?, ?) RETURNING *",
+                (uuid, statID, value, version,)
             )
 
         else:
             operation = await db.execute(
-                f"UPDATE gameStats SET value = ?, version = ? WHERE uuid = ? AND gameID = ? AND statID = ? AND version < ? RETURNING *",
-                (value, version, uuid, gameID, statID, version,)
+                f"UPDATE gameStats SET value = ?, version = ? WHERE uuid = ? AND statID = ? AND version < ? RETURNING *",
+                (value, version, uuid, statID, version,)
             )
 
         rows = [dict(row) for row in await operation.fetchall()]

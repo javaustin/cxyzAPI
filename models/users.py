@@ -2,11 +2,75 @@ from quart import request, jsonify, Blueprint
 import aiosqlite
 
 import app_instance
-from other.utils import path, deliver
+from other.utils import deliver
 
 print(f"loaded {__name__} routes")
 
 user_blueprint = Blueprint('user', __name__, url_prefix = "/user")
+
+@user_blueprint.route("/get_user/<uuid>", methods=["GET"])
+async def get_user(uuid):
+    print('hi')
+
+    if not uuid:
+        return jsonify({"error": "UUID required"}), 400  # bad request
+
+
+    db = app_instance.db
+
+    try:
+        await db.execute("PRAGMA journal_mode=WAL;")
+        db.row_factory = aiosqlite.Row
+
+        cursor = await db.execute(f"SELECT * FROM users WHERE uuid = ?", (uuid,))
+        rows = await cursor.fetchall()
+
+        if len(rows) >= 2:
+            print(f"[!] At least two rows both contain the same uuid={uuid}!")
+
+        if len(rows) == 0:
+            return jsonify({"message" : "User not found!"}), 404
+
+        return jsonify([dict(row) for row in rows][0]), 200
+
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : ex}), 500
+
+@user_blueprint.route("/get_user_attribute/<uuid>/<attribute>", methods=["GET"])
+async def get_user_attribute(uuid, attribute):
+
+    if not uuid:
+        return jsonify({"error": "UUID required"}), 400  # bad request
+
+
+    db = app_instance.db
+
+    try:
+        await db.execute("PRAGMA journal_mode=WAL;")
+        db.row_factory = aiosqlite.Row
+
+        cursor = await db.execute(f"SELECT * FROM users WHERE uuid = ?", (uuid,))
+        rows = await cursor.fetchall()
+
+        if len(rows) >= 2:
+            print(f"[!] At least two rows both contain the same uuid={uuid}!")
+
+        if len(rows) == 0:
+            return jsonify({"message" : "User not found!"}), 404
+
+        row : dict = [dict(row) for row in rows][0]
+
+        try:
+            return jsonify({"value" : row[attribute]}), 200
+        except KeyError:
+            return jsonify({"message" : f"Attribute {attribute} does not exist."}), 400
+
+
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : ex}), 500
+
 
 @user_blueprint.route("/create", methods=["POST"])
 async def create():

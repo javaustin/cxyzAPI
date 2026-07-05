@@ -25,8 +25,10 @@ def get(key : str):
 
         return data.get(key)
 
-path = get("db-path")
 api_key = get("api-key")
+path = get("db-path")
+quart_port = get("quart-port")
+quart_host = get("quart-host")
 
 async def post_request(url : str, data : dict):
     try:
@@ -44,7 +46,7 @@ async def post_request(url : str, data : dict):
             print(f"[🔃] POST in progress: {url}")
             result = await client.post(url, json = data, headers =
                     {
-                    'content-type' : "application/json",
+                    'Content-Type' : "application/json",
                     'X-Identifier' : Server.api.identifier,
                     'X-Timestamp' : str(timestamp),
                     'X-Signature' : signature
