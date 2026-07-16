@@ -21,19 +21,13 @@ async def create():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
+        cursor = await db.execute("INSERT INTO partyExpires (uuid, timestamp) VALUES (?, ?) RETURNING *", (uuid, timestamp,))
 
-        before = await db.execute(f"SELECT * FROM users WHERE uuid = ?", (uuid,))
-
-        if before.rowcount > 0:
-            return jsonify({"error": "duplicate uuids"}), 400
-
-        after = await db.execute("INSERT INTO partyExpires (uuid, timestamp) VALUES (?, ?) RETURNING *", (uuid, timestamp,))
-
-        after_rows = [dict(row) for row in await after.fetchall()]
+        after_rows = [dict(row) for row in await cursor.fetchall()]
 
         await deliver("partyExpires", after_rows, [])
+
+        await cursor.close()
 
         await db.commit()
 
@@ -56,16 +50,16 @@ async def sync():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
 
-        after = await db.execute("UPDATE partyExpires SET uuid = ?, timestamp = ? WHERE uuid = ? RETURNING *", (uuid, timestamp, uuid,))
+        cursor = await db.execute("UPDATE partyExpires SET uuid = ?, timestamp = ? WHERE uuid = ? RETURNING *", (uuid, timestamp, uuid,))
 
-        after_rows = [dict(row) for row in await after.fetchall()]
+        after_rows = [dict(row) for row in await cursor.fetchall()]
 
         await deliver("partyExpires", after_rows, [])
 
+        await cursor.close()
         await db.commit()
+
 
         return jsonify({"message": "Operation successful."}), 200
 
@@ -82,14 +76,14 @@ async def delete():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
 
         cursor = await db.execute("DELETE FROM partyExpires WHERE uuid = ? RETURNING *", (uuid,))
 
         await deliver("partyExpires", [], [dict(row) for row in await cursor.fetchall()])
 
+        await cursor.close()
         await db.commit()
+
 
         return jsonify({"message": "Operation successful."}), 200
 

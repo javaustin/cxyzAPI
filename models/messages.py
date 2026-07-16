@@ -30,9 +30,6 @@ async def submit():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
-
         before = await db.execute(f"SELECT * FROM messages WHERE recipient_uuid = '{recipient_uuid}' AND sender_uuid = '{sender_uuid}' AND timestamp = {timestamp} AND content = '{content}'")
         old_rows = await before.fetchall()
 
@@ -42,7 +39,11 @@ async def submit():
 
         await deliver("messages", [dict(row) for row in new_rows], [dict(row) for row in old_rows])
 
+        await before.close()
+        await after.close()
+
         await db.commit()
+
 
         return jsonify({"message": "Operation successful.", "message_data": data}), 200
     # sender_uuid, sender_name, recipient_uuid, recipient_name, content, timestamp
@@ -63,9 +64,6 @@ async def delete():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
-
         filters : list[str] = []
         params : list[str] = []
 
@@ -90,13 +88,15 @@ async def delete():
 
         cursor = await db.execute(f"DELETE FROM messages WHERE {'AND '.join(filters)} RETURNING *", params)
 
-
         new_rows = await cursor.fetchall()
+
 
         if len(new_rows) == 0:
             return jsonify({"error": "No message(s) found"}), 404
 
+        await cursor.close()
         await db.commit()
+
 
         await deliver("messages", [], [dict(row) for row in new_rows])
 

@@ -26,21 +26,15 @@ async def create():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL")
-        db.row_factory = aiosqlite.Row
-
-        before = await db.execute(f"SELECT * FROM parties WHERE ownerUUID = ?", (sender_uuid,))
-
-        if before.rowcount > 0:
-            return jsonify({"error": "duplicate uuids"}), 400
-
         after = await db.execute("INSERT INTO parties (ownerUUID, players, public) VALUES (?, ?, ?) RETURNING *", (sender_uuid, players, public,))
 
         after_rows = [dict(row) for row in await after.fetchall()]
 
         await deliver("parties", after_rows, [])
 
+        await after.close()
         await db.commit()
+
 
         return jsonify({"message": "Operation successful."}), 200
 
@@ -62,16 +56,15 @@ async def sync():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
-
         after = await db.execute("UPDATE parties SET ownerUUID = ?, players = ?, public = ? WHERE ownerUUID RETURNING *", (sender_uuid, players, public,))
 
         after_rows = [dict(row) for row in await after.fetchall()]
 
         await deliver("parties", after_rows, [])
 
+        await after.close()
         await db.commit()
+
 
         return jsonify({"message": "Operation successful."}), 200
 
@@ -88,14 +81,13 @@ async def delete():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
-
         cursor = await db.execute("DELETE FROM parties WHERE ownerUUID = ? RETURNING *", (sender_uuid,))
 
         await deliver("parties", [], [dict(row) for row in await cursor.fetchall()])
 
+        await cursor.close()
         await db.commit()
+
 
         return jsonify({"message": "Operation successful."}), 200
 

@@ -1,3 +1,4 @@
+from aiosqlite import cursor
 from quart import request, jsonify, Blueprint
 import aiosqlite
 
@@ -32,30 +33,32 @@ async def set():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
+        before = await db.execute("SELECT * FROM gameStats WHERE uuid = ? AND statID = ?", (uuid, statID,))
 
-        existing = await db.execute("SELECT * FROM gameStats WHERE uuid = ? AND statID = ?", (uuid, statID,))
-
-        rows = await existing.fetchall()
+        rows = await before.fetchall()
 
         if len(rows) == 0:
-            operation = await db.execute(
+            after = await db.execute(
                 f"INSERT INTO gameStats (uuid, statID, value, version) VALUES (?, ?, ?, ?) RETURNING *",
                 (uuid, statID, value, version,)
             )
 
         else:
-            operation = await db.execute(
+            after = await db.execute(
                 f"UPDATE gameStats SET value = ?, version = ? WHERE uuid = ? AND statID = ? AND version < ? RETURNING *",
                 (value, version, uuid, statID, version,)
             )
 
-        rows = [dict(row) for row in await operation.fetchall()]
+        rows = [dict(row) for row in await after.fetchall()]
 
         await deliver("gameStats", rows, [])
 
+
+        await before.close()
+        await after.close()
+
         await db.commit()
+
         return jsonify({"message" : "Operation successful."}), 200
 
     except aiosqlite.OperationalError as ex:

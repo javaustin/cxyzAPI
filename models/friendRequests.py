@@ -22,22 +22,20 @@ async def create():
     try:
         db = app_instance.db
 
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
+        cursor = await db.execute("INSERT INTO friendRequests (sender, recipient, expireTimestamp) VALUES (?, ?, ?) RETURNING *", (sender, recipient, expire_timestamp,))
 
-        operation = await db.execute("INSERT INTO friendRequests (sender, recipient, expireTimestamp) VALUES (?, ?, ?) RETURNING *", (sender, recipient, expire_timestamp,))
-
-        after_rows = [dict(row) for row in await operation.fetchall()]
+        after_rows = [dict(row) for row in await cursor.fetchall()]
 
         await deliver("friendRequests", after_rows, [])
 
+        await cursor.close()
         await db.commit()
+
 
         return jsonify({"message": "Operation successful."}), 200
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error", str(ex)}), 500
-
 
 @friend_request_blueprint.route("/delete", methods=["POST"])
 async def delete():
@@ -48,15 +46,13 @@ async def delete():
 
     try:
         db = app_instance.db
-
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
-
         cursor = await db.execute("DELETE FROM friendRequests WHERE sender = ? AND recipient = ? RETURNING *", (sender, recipient))
 
         await deliver("friendRequests", [], [dict(row) for row in await cursor.fetchall()])
 
+        await cursor.close()
         await db.commit()
+
         return jsonify({"message": "Operation successful."}), 200
 
     except aiosqlite.OperationalError as ex:

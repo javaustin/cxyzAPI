@@ -20,6 +20,11 @@ from other.utils import authenticate_request, DeliveryService, quart_host, quart
 # The API already has the corresponding game server secret associated with the provided identifier.
 # Upon receiving a request, the API recomputes the expected signature using the received fields and the stored secret, and verifies it matches the signature included in the request.
 
+# Notes
+# - We need to explicitly close all CURSORS (not db connection) after execution, we can use async with db or await cursor.close [update: we've completed this with the models, check to make sure it is complete everywhere]
+# - Using cursor.rowcount for SELECT statements is wrong, we must fetchall the rows and use len()
+# - TODO: ensure partyExpires AND parties is constrained by UNIQUE, then put IntegrityError try/except statements
+
 
 @app.before_request
 async def authorize():
@@ -66,16 +71,14 @@ async def mark_offline():
     try:
         db = app_instance.db
 
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
-
-        operation = await db.execute("UPDATE users SET online = false WHERE server = ?", (server,))
-        new_rows = await operation.fetchall()
+        cursor = await db.execute("UPDATE users SET online = false WHERE server = ? RETURNING *", (server,))
+        new_rows = await cursor.fetchall()
 
         if len(new_rows) == 0:
             return jsonify({"message": "Operation successful!"}), 200
 
-        # If we don't know exactly what kind of query we are receiving, we can simply provide the same rows. The plugin will delete (by key) what we mark as old data, and put in new data. So in effect we just modified the data.
+        # If we don't know exactly what kind of query we are receiving, we can simply provide the same rows.
+        # The plugin will delete (by key) what we mark as old data, and put in new data. So in effect we just modified the data.
         await other.utils.deliver("users", [dict(row) for row in new_rows], [dict(row) for row in new_rows])
 
         await db.commit()
@@ -95,8 +98,8 @@ async def seq(table):
 
     db = app_instance.db
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
+        
+       
 
         cursor = await db.execute(f"SELECT * FROM sqlite_sequence WHERE name = ?", (table,))
 

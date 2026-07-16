@@ -19,16 +19,18 @@ async def create():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
+        
+       
 
-        after = await db.execute("INSERT INTO partyInvites (inviter, recipient, expireTimestamp) VALUES (?, ?, ?) RETURNING *", (inviter, recipient, expire_timestamp,))
+        cursor = await db.execute("INSERT INTO partyInvites (inviter, recipient, expireTimestamp) VALUES (?, ?, ?) RETURNING *", (inviter, recipient, expire_timestamp,))
 
-        after_rows = [dict(row) for row in await after.fetchall()]
+        after_rows = [dict(row) for row in await cursor.fetchall()]
 
         await deliver("partyInvites", after_rows, [])
 
+        await cursor.close()
         await db.commit()
+
 
         return jsonify({"message": "Operation successful."}), 200
 
@@ -47,16 +49,15 @@ async def sync():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
+        cursor = await db.execute("UPDATE partyInvites SET inviter = ?, recipient = ?, expireTimestamp = ? WHERE inviter = ? RETURNING *", (inviter, recipient, expire_timestamp, inviter,))
 
-        after = await db.execute("UPDATE partyInvites SET inviter = ?, recipient = ?, expireTimestamp = ? WHERE inviter = ? RETURNING *", (inviter, recipient, expire_timestamp, inviter,))
-
-        after_rows = [dict(row) for row in await after.fetchall()]
+        after_rows = [dict(row) for row in await cursor.fetchall()]
 
         await deliver("partyInvites", after_rows, [])
 
+        await cursor.close()
         await db.commit()
+
 
         return jsonify({"message": "Operation successful."}), 200
 
@@ -75,14 +76,14 @@ async def delete():
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
-
         cursor = await db.execute("DELETE FROM partyInvites WHERE inviter = ? AND recipient = ? RETURNING *", (inviter, recipient))
 
         await deliver("partyInvites", [], [dict(row) for row in await cursor.fetchall()])
 
+        await cursor.close()
         await db.commit()
+
+
         return jsonify({"message": "Operation successful."}), 200
 
 

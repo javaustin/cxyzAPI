@@ -74,8 +74,8 @@ async def ship(table : str = "users"):
     db = app_instance.db
 
     try:
-        await db.execute("PRAGMA journal_mode=WAL;")
-        db.row_factory = aiosqlite.Row
+        
+       
 
         cursor = await db.execute(f"SELECT * FROM {table}")
 
