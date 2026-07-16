@@ -56,10 +56,10 @@ async def post_request(url : str, data : dict):
 
 
             if result.status_code != 200:
-                print(f"[⚠️] POST COMPLETED ({result.status_code}) {url}.\n\tBody: {json.dumps(result.json(), separators=(',', ':'))}")
+                print(f"[⚠️] POST COMPLETED ({result.status_code}) {url}.\n\tResponse: {json.dumps(result.json(), separators=(',', ':'))}")
 
             if result.status_code == 200:
-                print(f"[✅] POST COMPLETED ({result.status_code}) {url}.\n\tBody: {json.dumps(result.json(), separators=(',', ':'))}")
+                print(f"[✅] POST COMPLETED ({result.status_code}) {url}.\n\tResponse: {json.dumps(result.json(), separators=(',', ':'))}")
 
 
             return None

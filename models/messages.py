@@ -50,6 +50,61 @@ async def submit():
     except aiosqlite.OperationalError as ex:
         return jsonify({"error", str(ex)}), 500
 
+@message_blueprint.route("/delete", methods=["POST"])  # similar to get request
+async def delete():
+
+    data = await request.get_json()
+
+    sender_uuid = data.get("sender_uuid")
+    recipient_uuid = data.get("recipient_uuid")
+    content = data.get("content")
+    timestamp = data.get("timestamp")
+
+    db = app_instance.db
+
+    try:
+        await db.execute("PRAGMA journal_mode=WAL;")
+        db.row_factory = aiosqlite.Row
+
+        filters : list[str] = []
+        params : list[str] = []
+
+        if sender_uuid:
+            filters.append(f"sender_uuid = ?")
+            params.append(sender_uuid)
+
+        if recipient_uuid:
+            filters.append(f"recipient_uuid = ?")
+            params.append(recipient_uuid)
+
+        if content:
+            filters.append(f"content = ?")
+            params.append(content)
+
+        if timestamp:
+            filters.append(f"timestamp = ?")
+            params.append(timestamp)
+
+        if len(filters) == 0:
+            return jsonify({"error" : "Please specify any of the following arguments: sender_uuid, recipient_uuid, content, timestamp"}), 400
+
+        cursor = await db.execute(f"DELETE FROM messages WHERE {'AND '.join(filters)} RETURNING *", params)
+
+
+        new_rows = await cursor.fetchall()
+
+        if len(new_rows) == 0:
+            return jsonify({"error": "No message(s) found"}), 404
+
+        await db.commit()
+
+        await deliver("messages", [], [dict(row) for row in new_rows])
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : str(ex)}), 500
+
+
+    return jsonify({"message": "Operation successful."}), 200
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 __all__ = ["message_blueprint"]

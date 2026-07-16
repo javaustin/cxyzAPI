@@ -35,14 +35,10 @@ async def get_user(uuid):
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : ex}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 @user_blueprint.route("/get_user_attribute/<uuid>/<attribute>", methods=["GET"])
 async def get_user_attribute(uuid, attribute):
-
-    if not uuid:
-        return jsonify({"error": "UUID required"}), 400  # bad request
-
 
     db = app_instance.db
 
@@ -62,14 +58,12 @@ async def get_user_attribute(uuid, attribute):
         row : dict = [dict(row) for row in rows][0]
 
         try:
-            return jsonify({"value" : row[attribute]}), 200
+            return jsonify({attribute : row[attribute]}), 200
         except KeyError:
             return jsonify({"message" : f"Attribute {attribute} does not exist."}), 400
 
-
-
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : ex}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
 @user_blueprint.route("/create", methods=["POST"])
@@ -79,7 +73,7 @@ async def create():
     uuid = data.get("uuid")
 
     if not uuid:
-        return jsonify({"error": "user must have a uuid"}), 400
+        return jsonify({"error": "UUID required"}), 400
 
     columns = ', '.join([x for x in data.keys()])
     placeholders = ', '.join(['?'] * len(data.keys()))
@@ -107,7 +101,7 @@ async def create():
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : ex}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
 
@@ -140,7 +134,7 @@ async def delete():
         await deliver("users", [], [dict(row) for row in new_rows])
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : ex}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
     return jsonify({"message": "Operation successful.", "uuid": uuid}), 200
@@ -168,9 +162,6 @@ async def modify():
     if version is None:
         return jsonify({"error": "user must have a version"}), 400
 
-
-    print("user/modify (data): " + str(data))
-
     db = app_instance.db
 
     try:
@@ -189,8 +180,6 @@ async def modify():
         await deliver("users", [dict(row) for row in new_rows], [])
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : ex}), 500
-
-
+        return jsonify({"error" : str(ex)}), 500
 
     return jsonify({"message": "Operation successful.", "uuid" : uuid}), 200
