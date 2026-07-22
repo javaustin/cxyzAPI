@@ -1,4 +1,5 @@
 import json
+import re
 
 import app_instance
 import other.utils
@@ -21,10 +22,9 @@ from other.utils import authenticate_request, DeliveryService, quart_host, quart
 # Upon receiving a request, the API recomputes the expected signature using the received fields and the stored secret, and verifies it matches the signature included in the request.
 
 # Notes
-# - We need to explicitly close all CURSORS (not db connection) after execution, we can use async with db or await cursor.close [update: we've completed this with the models, check to make sure it is complete everywhere]
-# - Using cursor.rowcount for SELECT statements is wrong, we must fetchall the rows and use len()
-# - TODO: ensure partyExpires AND parties is constrained by UNIQUE, then put IntegrityError try/except statements
-
+# - Standardize messages for: duplicate entry, missing required arguments, ...
+# - For operation successful, standardize putting the amount of rows affected such as: {message : "{len(new_rows)} rows affected."}
+# - Make sure sql operation errors return a 400 error code, not 500
 
 @app.before_request
 async def authorize():
@@ -39,6 +39,55 @@ async def authorize():
 @app.route("/", methods=["GET", "POST"])
 async def home():
     return jsonify({"message" : "Welcome to my web server!"})
+
+@app.route("/sql", methods = ["POST"])
+async def sql():
+    data = await request.get_json()
+
+    # note: instead of only determining if a table is involved, let's rather determine whether the statement modifies rows (UPDATE, INSERT)
+
+    if not data:
+        return jsonify({"error" : "No request body supplied."}), 400
+
+    query = data.get("query")
+
+    if not query:
+        return jsonify({"error" : "`query` is required."}), 400
+
+    try:
+        db = app_instance.db
+
+        cursor = await db.execute(query)
+
+        rows = await cursor.fetchall()
+
+        await cursor.close()
+        await db.commit()
+
+        match = re.search(
+            r"(?:FROM|INTO|UPDATE)\s+([a-zA-Z_][a-zA-Z0-9_]*)",
+            query,
+            re.IGNORECASE
+        )
+        table = match.group(1) if match else None
+        
+        print(query)
+        should_push : bool = query.upper().startswith("INSERT") or query.upper().startswith("UPDATE") or query.upper().startswith("DELETE") or query.upper().startswith("REPLACE")
+
+        if table and should_push:
+            await other.utils.deliver(table, [dict(row) for row in rows], [dict(row) for row in rows])
+
+        elif not table:
+            return jsonify({"error" : "Could not fulfill push because the SQL query does not include a table."}), 400
+
+        res = [dict(row) for row in rows]
+        print(res)
+
+        return jsonify(res), 200
+
+    except aiosqlite.OperationalError as ex:
+        return jsonify({"error" : ex.__str__()}), 400
+
 
 @app.route("/cache", methods = ["POST"])
 async def cache():
@@ -63,16 +112,18 @@ async def mark_offline():
     server = data.get("server")
 
     if server is None:
-        return jsonify({"error", "`server` is required."}), 400
+        return jsonify({"error" : "`server` is required."}), 400
 
     if Server.get_server(server) is None:
-        return jsonify({"error", "Invalid server."}), 400
+        return jsonify({"error" : "Invalid server."}), 400
 
     try:
         db = app_instance.db
 
-        cursor = await db.execute("UPDATE users SET online = false WHERE server = ? RETURNING *", (server,))
+        cursor = await db.execute("UPDATE users SET online = false WHERE server = ? AND online = false RETURNING *", (server,))
         new_rows = await cursor.fetchall()
+
+        await cursor.close()
 
         if len(new_rows) == 0:
             return jsonify({"message": "Operation successful!"}), 200
@@ -89,7 +140,7 @@ async def mark_offline():
         return jsonify([dict(row) for row in new_rows]), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 @app.route("/seq/<table>", methods = ["GET"])
 async def seq(table):
@@ -98,12 +149,11 @@ async def seq(table):
 
     db = app_instance.db
     try:
-        
-       
-
         cursor = await db.execute(f"SELECT * FROM sqlite_sequence WHERE name = ?", (table,))
 
         res = await cursor.fetchone()
+
+        await cursor.close()
 
         if res is not None:
             return jsonify({"seq": int(res["seq"])}), 200
@@ -112,7 +162,7 @@ async def seq(table):
             return jsonify({"seq": 0}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 app.register_blueprint(parties.party_blueprint)

@@ -1,4 +1,3 @@
-from aiosqlite import cursor
 from quart import request, jsonify, Blueprint
 import aiosqlite
 
@@ -14,7 +13,7 @@ async def set():
     data = await request.get_json()
 
     uuid = data.get("uuid")
-    statID = data.get("statID")
+    stat_id = data.get("statID")
     value = data.get("value")
     version = data.get("version")
 
@@ -27,26 +26,26 @@ async def set():
 
     print("version: " + str(version))
 
-    if not all([uuid, statID, value, version]):
-        return jsonify({"error": "uuid,  statID, value, version are required"}), 400
+    if not all([uuid, stat_id, value, version]):
+        return jsonify({"error" : "uuid,  statID, value, version are required"}), 400
 
     db = app_instance.db
 
     try:
-        before = await db.execute("SELECT * FROM gameStats WHERE uuid = ? AND statID = ?", (uuid, statID,))
+        before = await db.execute("SELECT * FROM gameStats WHERE uuid = ? AND statID = ?", (uuid, stat_id,))
 
         rows = await before.fetchall()
 
         if len(rows) == 0:
             after = await db.execute(
                 f"INSERT INTO gameStats (uuid, statID, value, version) VALUES (?, ?, ?, ?) RETURNING *",
-                (uuid, statID, value, version,)
+                (uuid, stat_id, value, version,)
             )
 
         else:
             after = await db.execute(
                 f"UPDATE gameStats SET value = ?, version = ? WHERE uuid = ? AND statID = ? AND version < ? RETURNING *",
-                (value, version, uuid, statID, version,)
+                (value, version, uuid, stat_id, version,)
             )
 
         rows = [dict(row) for row in await after.fetchall()]

@@ -16,7 +16,9 @@ async def startup():
 
     app_instance.db = await aiosqlite.connect(path)
     app_instance.db.row_factory = aiosqlite.Row
-    await app_instance.db.execute("PRAGMA journal_mode=WAL")
+    cursor = await app_instance.db.execute("PRAGMA journal_mode=WAL")
+
+    await cursor.close()
 
     await run_cache(DeliveryService.tables) # Don't need a scheduler for this.
 
@@ -53,6 +55,8 @@ async def message_deleter():
 
         new_rows = await cursor.fetchall()
 
+        await cursor.close()
+
         await db.commit()
 
         await deliver("messages", [], [dict(row) for row in new_rows])
@@ -66,15 +70,14 @@ async def party_invite_deleter():
     db = app_instance.db
 
     try:
-        
-       
-
         cursor = await db.execute(
             f"DELETE FROM partyInvites WHERE expireTimestamp < ? RETURNING *",
             (int(time.time()),)
         )
 
         new_rows = await cursor.fetchall()
+
+        await cursor.close()
 
         await db.commit()
 

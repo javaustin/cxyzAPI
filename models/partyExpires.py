@@ -16,7 +16,7 @@ async def create():
     timestamp = data.get("timestamp")
 
     if not all([uuid, timestamp]):
-        return jsonify({"error": "uuid, timestamp is required"}), 400
+        return jsonify({"error" : "uuid, timestamp is required"}), 400
 
     db = app_instance.db
 
@@ -34,7 +34,7 @@ async def create():
         return jsonify({"message": "Operation successful."}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
 @expire_blueprint.route("/sync", methods=["POST"])
@@ -45,7 +45,7 @@ async def sync():
     timestamp = data.get("timestamp")
 
     if not all([uuid, timestamp]):
-        return jsonify({"error": "uuid, timestamp is required"}), 400
+        return jsonify({"error" : "uuid, timestamp is required"}), 400
 
     db = app_instance.db
 
@@ -64,7 +64,7 @@ async def sync():
         return jsonify({"message": "Operation successful."}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
 @expire_blueprint.route("/delete", methods=["POST"])
@@ -88,7 +88,7 @@ async def delete():
         return jsonify({"message": "Operation successful."}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #

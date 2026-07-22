@@ -12,7 +12,7 @@ user_blueprint = Blueprint('user', __name__, url_prefix = "/user")
 async def get_user(uuid):
 
     if not uuid:
-        return jsonify({"error": "UUID required"}), 400  # bad request
+        return jsonify({"error" : "UUID required"}), 400  # bad request
 
     db = app_instance.db
 
@@ -71,7 +71,7 @@ async def create():
     uuid = data.get("uuid")
 
     if not uuid:
-        return jsonify({"error": "UUID required"}), 400
+        return jsonify({"error" : "UUID required"}), 400
 
     columns = ', '.join([x for x in data.keys()])
     placeholders = ', '.join(['?'] * len(data.keys()))
@@ -118,7 +118,7 @@ async def delete():
         new_rows = await cursor.fetchall()
 
         if len(new_rows) == 0:
-            return jsonify({"error": "No user found", "uuid": uuid}), 404
+            return jsonify({"error" : "No user found", "uuid": uuid}), 404
 
         await cursor.close()
         await db.commit()
@@ -137,7 +137,7 @@ async def modify():
     data = await request.get_json()
 
     if not data:
-        return jsonify({"error": "No data provided"}), 400  # bad request
+        return jsonify({"error" : "No data provided"}), 400  # bad request
 
     columns = ", ".join([f"{key} = ?" for key in data.keys()])
     values = list(data.values())
@@ -150,10 +150,10 @@ async def modify():
         return jsonify({"error" : "version must be an integer"}), 400
 
     if not uuid:
-        return jsonify({"error": "user must have a uuid"}), 400
+        return jsonify({"error" : "user must have a uuid"}), 400
 
     if version is None:
-        return jsonify({"error": "user must have a version"}), 400
+        return jsonify({"error" : "user must have a version"}), 400
 
     db = app_instance.db
 
@@ -167,7 +167,7 @@ async def modify():
 
 
         if len(new_rows) == 0:
-            return jsonify({"error": "No rows affected on SQL operation. Either the uuid is invalid or the object version is not synced."}), 404
+            return jsonify({"error" : "No rows affected on SQL operation. Either the uuid is invalid or the object version is not synced."}), 404
 
         await deliver("users", [dict(row) for row in new_rows], [])
 

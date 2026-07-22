@@ -6,7 +6,6 @@ import time
 from urllib.parse import urlparse
 
 import httpx
-import aiosqlite
 import quart.app
 
 import app_instance
@@ -74,12 +73,11 @@ async def ship(table : str = "users"):
     db = app_instance.db
 
     try:
-        
-       
-
         cursor = await db.execute(f"SELECT * FROM {table}")
 
         res = await cursor.fetchall()
+
+        await cursor.close()
 
         for server in Server.servers:
             await post_request(f"{server.ip}/{table}Shipment", {"data" : [dict(row) for row in res]})
@@ -125,9 +123,9 @@ async def authenticate_request(request : quart.app.Request):
     data = await request.get_data(as_text = True)
 
     payload : str = data
-    identifier : str = request.headers.get("X-Identifier", None)
-    timestamp_string : str = request.headers.get("X-Timestamp", None)
-    signature : str = request.headers.get("X-Signature", None)
+    identifier = request.headers.get("X-Identifier", None)
+    timestamp_string  = request.headers.get("X-Timestamp", None)
+    signature  = request.headers.get("X-Signature", None)
     urlpath : str = request.path
     method : str = request.method
 
@@ -153,7 +151,7 @@ async def authenticate_request(request : quart.app.Request):
     server = Server.get_server(identifier)
 
     if server is None:
-        raise AuthenticationFailException(f"No service with identifier={identifier} is registered.")
+        raise AuthenticationFailException(f"No service with identifier '{identifier}' is registered in config.json.")
 
     local_signature = generate_signature(
         identifier = server.identifier,

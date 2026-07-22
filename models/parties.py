@@ -8,10 +8,6 @@ print(f"loaded {__name__} routes")
 
 party_blueprint = Blueprint('party', __name__, url_prefix = "/party")
 
-# can we rely on the game server to tell us if a player has a party?
-# in other words: in what case will the server think that the player owns a party that truly
-
-
 @party_blueprint.route("/create", methods=["POST"])
 async def create():
     data = await request.get_json()
@@ -21,7 +17,7 @@ async def create():
     public = data.get("public")
 
     if not sender_uuid:
-        return jsonify({"error": "uuid is required"}), 400
+        return jsonify({"error" : "uuid is required"}), 400
 
     db = app_instance.db
 
@@ -38,8 +34,13 @@ async def create():
 
         return jsonify({"message": "Operation successful."}), 200
 
+    except aiosqlite.IntegrityError:
+        # Unique constraint failed
+        return jsonify({"error" : "duplicate uuid"}), 400
+
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
+
 
 
 @party_blueprint.route("/sync", methods=["POST"])
@@ -51,7 +52,7 @@ async def sync():
     public = data.get("public")
 
     if not sender_uuid:
-        return jsonify({"error": "uuid is required"}), 400
+        return jsonify({"error" : "uuid is required"}), 400
 
     db = app_instance.db
 
@@ -69,7 +70,7 @@ async def sync():
         return jsonify({"message": "Operation successful."}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
 @party_blueprint.route("/delete", methods=["POST"])
@@ -93,7 +94,7 @@ async def delete():
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #

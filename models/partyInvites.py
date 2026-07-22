@@ -19,9 +19,6 @@ async def create():
     db = app_instance.db
 
     try:
-        
-       
-
         cursor = await db.execute("INSERT INTO partyInvites (inviter, recipient, expireTimestamp) VALUES (?, ?, ?) RETURNING *", (inviter, recipient, expire_timestamp,))
 
         after_rows = [dict(row) for row in await cursor.fetchall()]
@@ -34,8 +31,12 @@ async def create():
 
         return jsonify({"message": "Operation successful."}), 200
 
+    except aiosqlite.IntegrityError:
+        # Unique constraint failed
+        return jsonify({"error" : "duplicate uuid"}), 400
+
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
 @invite_blueprint.route("/sync", methods=["POST"])
@@ -63,7 +64,7 @@ async def sync():
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
 @invite_blueprint.route("/delete", methods=["POST"])
@@ -88,7 +89,7 @@ async def delete():
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #

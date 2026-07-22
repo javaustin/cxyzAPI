@@ -17,7 +17,7 @@ async def create():
     expire_timestamp = data.get("expireTimestamp")
 
     if not all([sender, recipient, expire_timestamp]):
-        return jsonify({"error": "sender, recipient, expire_timestamp is required"}), 400
+        return jsonify({"error" : "sender, recipient, expire_timestamp is required"}), 400
 
     try:
         db = app_instance.db
@@ -35,7 +35,7 @@ async def create():
         return jsonify({"message": "Operation successful."}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 @friend_request_blueprint.route("/delete", methods=["POST"])
 async def delete():
@@ -56,7 +56,7 @@ async def delete():
         return jsonify({"message": "Operation successful."}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error", str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 500
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 __all__ = ["friend_request_blueprint"]
