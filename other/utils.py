@@ -73,11 +73,10 @@ async def ship(table : str = "users"):
     db = app_instance.db
 
     try:
-        cursor = await db.execute(f"SELECT * FROM {table}")
-
-        res = await cursor.fetchall()
-
-        await cursor.close()
+        async with app_instance.db_lock:
+            cursor = await db.execute(f"SELECT * FROM {table}")
+            res = await cursor.fetchall()
+            await cursor.close()
 
         for server in Server.servers:
             await post_request(f"{server.ip}/{table}Shipment", {"data" : [dict(row) for row in res]})

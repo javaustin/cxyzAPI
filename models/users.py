@@ -17,10 +17,10 @@ async def get_user(uuid):
     db = app_instance.db
 
     try:
-        cursor = await db.execute(f"SELECT * FROM users WHERE uuid = ?", (uuid,))
-        rows = await cursor.fetchall()
-
-        await cursor.close()
+        async with app_instance.db_lock:
+            cursor = await db.execute(f"SELECT * FROM users WHERE uuid = ?", (uuid,))
+            rows = await cursor.fetchall()
+            await cursor.close()
 
         if len(rows) >= 2:
             print(f"[!] At least two rows both contain the same uuid={uuid}!")
@@ -40,11 +40,10 @@ async def get_user_attribute(uuid, attribute):
     db = app_instance.db
 
     try:
-
-        cursor = await db.execute(f"SELECT * FROM users WHERE uuid = ?", (uuid,))
-        rows = await cursor.fetchall()
-
-        await cursor.close()
+        async with app_instance.db_lock:
+            cursor = await db.execute(f"SELECT * FROM users WHERE uuid = ?", (uuid,))
+            rows = await cursor.fetchall()
+            await cursor.close()
 
         if len(rows) >= 2:
             print(f"[!] At least two rows both contain the same uuid={uuid}!")
@@ -80,11 +79,11 @@ async def create():
     db = app_instance.db
 
     try:
-        cursor = await db.execute(f"INSERT INTO users ({columns}) VALUES ({placeholders}) RETURNING *", values)
-        new_rows = await cursor.fetchall()
-
-        await cursor.close()
-        await db.commit()
+        async with app_instance.db_lock:
+            cursor = await db.execute(f"INSERT INTO users ({columns}) VALUES ({placeholders}) RETURNING *", values)
+            new_rows = await cursor.fetchall()
+            await cursor.close()
+            await db.commit()
 
         await deliver("users", [dict(row) for row in new_rows], [])
 
@@ -112,16 +111,16 @@ async def delete():
     db = app_instance.db
 
     try:
+        async with app_instance.db_lock:
+            cursor = await db.execute(f"DELETE FROM users WHERE uuid = ? RETURNING *", (uuid,))
+            new_rows = await cursor.fetchall()
 
-        cursor = await db.execute(f"DELETE FROM users WHERE uuid = ? RETURNING *", (uuid,))
+            if len(new_rows) == 0:
+                await cursor.close()
+                return jsonify({"error" : "No user found", "uuid": uuid}), 404
 
-        new_rows = await cursor.fetchall()
-
-        if len(new_rows) == 0:
-            return jsonify({"error" : "No user found", "uuid": uuid}), 404
-
-        await cursor.close()
-        await db.commit()
+            await cursor.close()
+            await db.commit()
 
 
         await deliver("users", [], [dict(row) for row in new_rows])
@@ -158,12 +157,11 @@ async def modify():
     db = app_instance.db
 
     try:
-        cursor = await db.execute(f"UPDATE users SET {columns} WHERE uuid = '{uuid}' AND version < {version} RETURNING *", (*values,))
-
-        new_rows = await cursor.fetchall()
-
-        await cursor.close()
-        await db.commit()
+        async with app_instance.db_lock:
+            cursor = await db.execute(f"UPDATE users SET {columns} WHERE uuid = '{uuid}' AND version < {version} RETURNING *", (*values,))
+            new_rows = await cursor.fetchall()
+            await cursor.close()
+            await db.commit()
 
 
         if len(new_rows) == 0:

@@ -57,12 +57,11 @@ async def sql():
     try:
         db = app_instance.db
 
-        cursor = await db.execute(query)
-
-        rows = await cursor.fetchall()
-
-        await cursor.close()
-        await db.commit()
+        async with app_instance.db_lock:
+            cursor = await db.execute(query)
+            rows = await cursor.fetchall()
+            await cursor.close()
+            await db.commit()
 
         match = re.search(
             r"(?:FROM|INTO|UPDATE)\s+([a-zA-Z_][a-zA-Z0-9_]*)",
@@ -120,10 +119,11 @@ async def mark_offline():
     try:
         db = app_instance.db
 
-        cursor = await db.execute("UPDATE users SET online = false WHERE server = ? AND online = false RETURNING *", (server,))
-        new_rows = await cursor.fetchall()
-
-        await cursor.close()
+        async with app_instance.db_lock:
+            cursor = await db.execute("UPDATE users SET online = false WHERE server = ? AND online = false RETURNING *", (server,))
+            new_rows = await cursor.fetchall()
+            await cursor.close()
+            await db.commit()
 
         if len(new_rows) == 0:
             return jsonify({"message": "Operation successful!"}), 200
@@ -131,8 +131,6 @@ async def mark_offline():
         # If we don't know exactly what kind of query we are receiving, we can simply provide the same rows.
         # The plugin will delete (by key) what we mark as old data, and put in new data. So in effect we just modified the data.
         await other.utils.deliver("users", [dict(row) for row in new_rows], [dict(row) for row in new_rows])
-
-        await db.commit()
 
         if new_rows is None:
             return jsonify({"message": "Operation successful!"}), 200
@@ -149,11 +147,10 @@ async def seq(table):
 
     db = app_instance.db
     try:
-        cursor = await db.execute(f"SELECT * FROM sqlite_sequence WHERE name = ?", (table,))
-
-        res = await cursor.fetchone()
-
-        await cursor.close()
+        async with app_instance.db_lock:
+            cursor = await db.execute(f"SELECT * FROM sqlite_sequence WHERE name = ?", (table,))
+            res = await cursor.fetchone()
+            await cursor.close()
 
         if res is not None:
             return jsonify({"seq": int(res["seq"])}), 200

@@ -21,15 +21,13 @@ async def create():
     db = app_instance.db
 
     try:
-        cursor = await db.execute("INSERT INTO partyExpires (uuid, timestamp) VALUES (?, ?) RETURNING *", (uuid, timestamp,))
-
-        after_rows = [dict(row) for row in await cursor.fetchall()]
+        async with app_instance.db_lock:
+            cursor = await db.execute("INSERT INTO partyExpires (uuid, timestamp) VALUES (?, ?) RETURNING *", (uuid, timestamp,))
+            after_rows = [dict(row) for row in await cursor.fetchall()]
+            await cursor.close()
+            await db.commit()
 
         await deliver("partyExpires", after_rows, [])
-
-        await cursor.close()
-
-        await db.commit()
 
         return jsonify({"message": "Operation successful."}), 200
 
@@ -50,15 +48,13 @@ async def sync():
     db = app_instance.db
 
     try:
-
-        cursor = await db.execute("UPDATE partyExpires SET uuid = ?, timestamp = ? WHERE uuid = ? RETURNING *", (uuid, timestamp, uuid,))
-
-        after_rows = [dict(row) for row in await cursor.fetchall()]
+        async with app_instance.db_lock:
+            cursor = await db.execute("UPDATE partyExpires SET uuid = ?, timestamp = ? WHERE uuid = ? RETURNING *", (uuid, timestamp, uuid,))
+            after_rows = [dict(row) for row in await cursor.fetchall()]
+            await cursor.close()
+            await db.commit()
 
         await deliver("partyExpires", after_rows, [])
-
-        await cursor.close()
-        await db.commit()
 
 
         return jsonify({"message": "Operation successful."}), 200
@@ -76,13 +72,13 @@ async def delete():
     db = app_instance.db
 
     try:
+        async with app_instance.db_lock:
+            cursor = await db.execute("DELETE FROM partyExpires WHERE uuid = ? RETURNING *", (uuid,))
+            deleted_rows = [dict(row) for row in await cursor.fetchall()]
+            await cursor.close()
+            await db.commit()
 
-        cursor = await db.execute("DELETE FROM partyExpires WHERE uuid = ? RETURNING *", (uuid,))
-
-        await deliver("partyExpires", [], [dict(row) for row in await cursor.fetchall()])
-
-        await cursor.close()
-        await db.commit()
+        await deliver("partyExpires", [], deleted_rows)
 
 
         return jsonify({"message": "Operation successful."}), 200

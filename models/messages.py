@@ -30,19 +30,18 @@ async def submit():
     db = app_instance.db
 
     try:
-        before = await db.execute(f"SELECT * FROM messages WHERE recipient_uuid = '{recipient_uuid}' AND sender_uuid = '{sender_uuid}' AND timestamp = {timestamp} AND content = '{content}'")
-        old_rows = await before.fetchall()
+        async with app_instance.db_lock:
+            before = await db.execute(f"SELECT * FROM messages WHERE recipient_uuid = '{recipient_uuid}' AND sender_uuid = '{sender_uuid}' AND timestamp = {timestamp} AND content = '{content}'")
+            old_rows = await before.fetchall()
 
-        after = await db.execute(f"INSERT INTO messages ({columns}) VALUES (?, ?, ?, ?, ?, ?)", values)
+            after = await db.execute(f"INSERT INTO messages ({columns}) VALUES (?, ?, ?, ?, ?, ?)", values)
+            new_rows = await after.fetchall()
 
-        new_rows = await after.fetchall()
+            await before.close()
+            await after.close()
+            await db.commit()
 
         await deliver("messages", [dict(row) for row in new_rows], [dict(row) for row in old_rows])
-
-        await before.close()
-        await after.close()
-
-        await db.commit()
 
 
         return jsonify({"message": "Operation successful.", "message_data": data}), 200
@@ -83,17 +82,17 @@ async def query():
             filters.append(f"timestamp >= ?")
             params.append(timestamp)
 
-        if len(filters) == 0:
-            cursor = await db.execute("SELECT * FROM messages")
-        else:
-            cursor = await db.execute(f"SELECT * FROM messages WHERE {'AND '.join(filters)}", params)
+        async with app_instance.db_lock:
+            if len(filters) == 0:
+                cursor = await db.execute("SELECT * FROM messages")
+            else:
+                cursor = await db.execute(f"SELECT * FROM messages WHERE {'AND '.join(filters)}", params)
 
-        rows = await cursor.fetchall()
+            rows = await cursor.fetchall()
+            await cursor.close()
 
         if len(rows) == 0:
             return jsonify({"error" : "No messages found"}), 404
-
-        await cursor.close()
 
         return jsonify({"messages": [dict(row) for row in rows]}), 200
 
@@ -135,12 +134,11 @@ async def delete():
         if len(filters) == 0:
             return jsonify({"error" : "Please specify any of the following arguments: sender_uuid, recipient_uuid, content, timestamp"}), 400
 
-        cursor = await db.execute(f"DELETE FROM messages WHERE {'AND '.join(filters)} RETURNING *", params)
-
-        new_rows = await cursor.fetchall()
-
-        await cursor.close()
-        await db.commit()
+        async with app_instance.db_lock:
+            cursor = await db.execute(f"DELETE FROM messages WHERE {'AND '.join(filters)} RETURNING *", params)
+            new_rows = await cursor.fetchall()
+            await cursor.close()
+            await db.commit()
 
         await deliver("messages", [], [dict(row) for row in new_rows])
 

@@ -10,12 +10,10 @@ punishment_blueprint = Blueprint('punishment', __name__, url_prefix = "/punishme
 
 async def get_sequence_id() -> int:
     db = app_instance.db
-
-    cursor = await db.execute(f"SELECT * FROM sqlite_sequence WHERE name = 'punishments'")
-
-    res = await cursor.fetchone()
-
-    await cursor.close()
+    async with app_instance.db_lock:
+        cursor = await db.execute(f"SELECT * FROM sqlite_sequence WHERE name = 'punishments'")
+        res = await cursor.fetchone()
+        await cursor.close()
 
     if res is not None:
         return int(res["seq"])
@@ -57,12 +55,11 @@ async def set():
     try:
 
         query = f"INSERT INTO punishments ({', '.join(keys)}) VALUES ({('?, ' * len(values))[:-2]}) RETURNING *"
-        cursor = await db.execute(query, values,)
-
-        new_rows = await cursor.fetchall()
-
-        await cursor.close()
-        await db.commit()
+        async with app_instance.db_lock:
+            cursor = await db.execute(query, values,)
+            new_rows = await cursor.fetchall()
+            await cursor.close()
+            await db.commit()
 
 
         if reship:
@@ -88,15 +85,14 @@ async def delete():
 
     try:
         punishment = {}
+        async with app_instance.db_lock:
+            cursor = await db.execute(f"DELETE FROM punishments WHERE id = {id} RETURNING *")
+            deleted_rows = [dict(row) for row in await cursor.fetchall()]
+            # The plugin will remove the old rows (or single row in this case, and not add any new ones, since that argument is left blank)
+            await cursor.close()
+            await db.commit()
 
-        cursor = await db.execute(f"DELETE FROM punishments WHERE id = {id} RETURNING *")
-        deleted_rows = await cursor.fetchall()
-
-        await deliver("punishments", [], [dict(row) for row in deleted_rows])
-        # The plugin will remove the old rows (or single row in this case, and not add any new ones, since that argument is left blank)
-
-        await cursor.close()
-        await db.commit()
+        await deliver("punishments", [], deleted_rows)
 
 
         return jsonify({"message": "Operation successful!", "punishment": punishment}), 200
@@ -128,15 +124,16 @@ async def edit():
     db = app_instance.db
 
     try:
-        cursor = await db.execute(query, values)
+        async with app_instance.db_lock:
+            cursor = await db.execute(query, values)
+            new_rows = await cursor.fetchall()
 
-        new_rows = await cursor.fetchall()
+            if len(new_rows) == 0:
+                await cursor.close()
+                return jsonify({"message": "No row found"}), 404
 
-        if len(new_rows) == 0:
-            return jsonify({"message": "No row found"}), 404
-
-        await cursor.close()
-        await db.commit()
+            await cursor.close()
+            await db.commit()
 
 
         await deliver("punishments", [dict(row) for row in new_rows], [])
@@ -159,12 +156,11 @@ async def clear():
     db = app_instance.db
 
     try:
-        cursor = await db.execute("DELETE FROM punishments WHERE uuid = ? RETURNING *", (uuid,))
-
-        deleted_rows = await cursor.fetchall()
-
-        await cursor.close()
-        await db.commit()
+        async with app_instance.db_lock:
+            cursor = await db.execute("DELETE FROM punishments WHERE uuid = ? RETURNING *", (uuid,))
+            deleted_rows = await cursor.fetchall()
+            await cursor.close()
+            await db.commit()
 
 
         await deliver("punishments", [], [dict(row) for row in deleted_rows])

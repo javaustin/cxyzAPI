@@ -21,15 +21,13 @@ async def create():
 
     try:
         db = app_instance.db
-
-        cursor = await db.execute("INSERT INTO friendRequests (sender, recipient, expireTimestamp) VALUES (?, ?, ?) RETURNING *", (sender, recipient, expire_timestamp,))
-
-        after_rows = [dict(row) for row in await cursor.fetchall()]
+        async with app_instance.db_lock:
+            cursor = await db.execute("INSERT INTO friendRequests (sender, recipient, expireTimestamp) VALUES (?, ?, ?) RETURNING *", (sender, recipient, expire_timestamp,))
+            after_rows = [dict(row) for row in await cursor.fetchall()]
+            await cursor.close()
+            await db.commit()
 
         await deliver("friendRequests", after_rows, [])
-
-        await cursor.close()
-        await db.commit()
 
 
         return jsonify({"message": "Operation successful."}), 200
@@ -46,12 +44,13 @@ async def delete():
 
     try:
         db = app_instance.db
-        cursor = await db.execute("DELETE FROM friendRequests WHERE sender = ? AND recipient = ? RETURNING *", (sender, recipient))
+        async with app_instance.db_lock:
+            cursor = await db.execute("DELETE FROM friendRequests WHERE sender = ? AND recipient = ? RETURNING *", (sender, recipient))
+            deleted_rows = [dict(row) for row in await cursor.fetchall()]
+            await cursor.close()
+            await db.commit()
 
-        await deliver("friendRequests", [], [dict(row) for row in await cursor.fetchall()])
-
-        await cursor.close()
-        await db.commit()
+        await deliver("friendRequests", [], deleted_rows)
 
         return jsonify({"message": "Operation successful."}), 200
 

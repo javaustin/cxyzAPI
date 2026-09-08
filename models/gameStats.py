@@ -6,7 +6,7 @@ from other.utils import deliver
 
 print(f"loaded {__name__} routes")
 
-game_stats_blueprint = Blueprint('gameStats', __name__, url_prefix ="/gameStat")
+game_stats_blueprint = Blueprint('gameStat', __name__, url_prefix ="/gameStat")
 
 @game_stats_blueprint.route("/set", methods = ["POST"])
 async def set():
@@ -32,31 +32,27 @@ async def set():
     db = app_instance.db
 
     try:
-        before = await db.execute("SELECT * FROM gameStats WHERE uuid = ? AND statID = ?", (uuid, stat_id,))
+        async with app_instance.db_lock:
+            before = await db.execute("SELECT * FROM gameStats WHERE uuid = ? AND statID = ?", (uuid, stat_id,))
+            rows = await before.fetchall()
+            await before.close()
 
-        rows = await before.fetchall()
+            if len(rows) == 0:
+                after = await db.execute(
+                    f"INSERT INTO gameStats (uuid, statID, value, version) VALUES (?, ?, ?, ?) RETURNING *",
+                    (uuid, stat_id, value, version,)
+                )
+            else:
+                after = await db.execute(
+                    f"UPDATE gameStats SET value = ?, version = ? WHERE uuid = ? AND statID = ? AND version < ? RETURNING *",
+                    (value, version, uuid, stat_id, version,)
+                )
 
-        if len(rows) == 0:
-            after = await db.execute(
-                f"INSERT INTO gameStats (uuid, statID, value, version) VALUES (?, ?, ?, ?) RETURNING *",
-                (uuid, stat_id, value, version,)
-            )
-
-        else:
-            after = await db.execute(
-                f"UPDATE gameStats SET value = ?, version = ? WHERE uuid = ? AND statID = ? AND version < ? RETURNING *",
-                (value, version, uuid, stat_id, version,)
-            )
-
-        rows = [dict(row) for row in await after.fetchall()]
+            rows = [dict(row) for row in await after.fetchall()]
+            await after.close()
+            await db.commit()
 
         await deliver("gameStats", rows, [])
-
-
-        await before.close()
-        await after.close()
-
-        await db.commit()
 
         return jsonify({"message" : "Operation successful."}), 200
 

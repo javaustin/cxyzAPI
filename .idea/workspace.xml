@@ -4,7 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5abbb016-b73f-46dd-ba38-a51537f89c23" name="Changes" comment="" />
+    <list default="true" id="5abbb016-b73f-46dd-ba38-a51537f89c23" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app_instance.py" beforeDir="false" afterPath="$PROJECT_DIR$/app_instance.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/friendRequests.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/friendRequests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/gameStats.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/gameStats.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/messages.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/messages.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/parties.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/parties.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/partyExpires.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/partyExpires.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/partyInvites.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/partyInvites.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/punishment.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/punishment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/users.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/tasks.py" beforeDir="false" afterPath="$PROJECT_DIR$/other/tasks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/other/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.db" beforeDir="false" afterPath="$PROJECT_DIR$/server.db" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,61 +58,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.7189988376823982E-6" />
-      <entry key="MS500" value="0.07031615529305059" />
-      <entry key="S2" value="0.514948478337449" />
-      <entry key="S5" value="0.766841329836546" />
-      <entry key="S10" value="0.8756947697894204" />
-      <entry key="S30" value="0.9567186761834746" />
-      <entry key="S60" value="0.9781200579047308" />
-      <entry key="M2" value="0.9900187333060813" />
-      <entry key="M5" value="1.469220091007548" />
-      <entry key="M10" value="6.294658804547539" />
-      <entry key="M15" value="14.221629766317276" />
-      <entry key="M30" value="47.68090964517239" />
-      <entry key="H1" value="126.93100093560963" />
-      <entry key="H2" value="246.95725394036242" />
-      <entry key="H4" value="383.7800292318906" />
-      <entry key="D1" value="620.7001169741442" />
-      <entry key="W1" value="683.6008770852201" />
+      <entry key="MS100" value="1.926912201227685" />
+      <entry key="MS500" value="3.912217124615013" />
+      <entry key="S2" value="11.586697569305061" />
+      <entry key="S5" value="21.672421392829364" />
+      <entry key="S10" value="39.34204067987771" />
+      <entry key="S30" value="116.07344639599118" />
+      <entry key="S60" value="206.46639607880743" />
+      <entry key="M2" value="297.18572133634905" />
+      <entry key="M5" value="381.2317249444573" />
+      <entry key="M10" value="420.63548938798573" />
+      <entry key="M15" value="439.78500172322947" />
+      <entry key="M30" value="481.682963503631" />
+      <entry key="H1" value="562.6678264874959" />
+      <entry key="H2" value="686.7984265676799" />
+      <entry key="H4" value="830.5357569169163" />
+      <entry key="D1" value="1082.3863533046751" />
+      <entry key="W1" value="1149.7678537185795" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="1.0001915488520257" />
-      <entry key="MS500" value="1.180491149440312" />
-      <entry key="S2" value="1.651799432010588" />
-      <entry key="S5" value="1.8426468295031517" />
-      <entry key="S10" value="1.9179579671766849" />
-      <entry key="S30" value="1.9718687068201959" />
-      <entry key="S60" value="1.985834055017298" />
-      <entry key="M2" value="1.9932884562298803" />
-      <entry key="M5" value="2.109479496462805" />
-      <entry key="M10" value="2.8276131349549316" />
-      <entry key="M15" value="3.7074934720378607" />
-      <entry key="M30" value="6.493243981714516" />
-      <entry key="H1" value="12.196414178710212" />
-      <entry key="H2" value="20.83718970287647" />
-      <entry key="H4" value="31.33166909290702" />
-      <entry key="D1" value="50.724768218959234" />
-      <entry key="W1" value="56.032950433357385" />
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="1.8933408598271385E-118" />
+      <entry key="S5" value="1.2302248127559175E-47" />
+      <entry key="S10" value="4.9595575406293106E-24" />
+      <entry key="S30" value="2.8581490974346417E-8" />
+      <entry key="S60" value="2.896767090817929E-4" />
+      <entry key="M2" value="0.034055605126101944" />
+      <entry key="M5" value="0.6692604937012031" />
+      <entry key="M10" value="2.0670245805997682" />
+      <entry key="M15" value="3.32619577127361" />
+      <entry key="M30" value="6.621845865582387" />
+      <entry key="H1" value="12.639361274622553" />
+      <entry key="H2" value="21.71267788753257" />
+      <entry key="H4" value="32.755335520517136" />
+      <entry key="D1" value="53.30318019023065" />
+      <entry key="W1" value="58.96648996589747" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.016070884268225675" />
-      <entry key="MS500" value="0.5547432774073189" />
-      <entry key="S2" value="1.761909085426342" />
-      <entry key="S5" value="2.4000380408907924" />
-      <entry key="S10" value="2.6787020339341145" />
-      <entry key="S30" value="2.8877319610877037" />
-      <entry key="S60" value="2.9431909080900724" />
-      <entry key="M2" value="2.9728362619524167" />
-      <entry key="M5" value="3.5739602655576355" />
-      <entry key="M10" value="9.117908707699547" />
-      <entry key="M15" value="17.92427664474841" />
-      <entry key="M30" value="54.16729691579126" />
-      <entry key="H1" value="139.11824441820787" />
-      <entry key="H2" value="267.7855124813588" />
-      <entry key="H4" value="415.104855614703" />
-      <entry key="D1" value="671.4230879000265" />
-      <entry key="W1" value="739.6335463690039" />
+      <entry key="MS100" value="1.7766304578993393" />
+      <entry key="MS500" value="3.838020074857898" />
+      <entry key="S2" value="11.524846329177928" />
+      <entry key="S5" value="21.626370700648028" />
+      <entry key="S10" value="39.29879817602563" />
+      <entry key="S30" value="116.02576622421245" />
+      <entry key="S60" value="206.42424660286764" />
+      <entry key="M2" value="297.189046406398" />
+      <entry key="M5" value="381.88079602334705" />
+      <entry key="M10" value="422.6868384650227" />
+      <entry key="M15" value="443.09768752117776" />
+      <entry key="M30" value="488.29332740027814" />
+      <entry key="H1" value="575.2958392592252" />
+      <entry key="H2" value="708.5009961979276" />
+      <entry key="H4" value="863.2835458263174" />
+      <entry key="D1" value="1135.687575974372" />
+      <entry key="W1" value="1208.734037830306" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">

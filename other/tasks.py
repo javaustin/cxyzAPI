@@ -17,6 +17,7 @@ async def startup():
     app_instance.db = await aiosqlite.connect(path)
     app_instance.db.row_factory = aiosqlite.Row
     cursor = await app_instance.db.execute("PRAGMA journal_mode=WAL")
+    await app_instance.db.execute("PRAGMA busy_timeout = 5000")
 
     await cursor.close()
 
@@ -24,7 +25,9 @@ async def startup():
 
     scheduler.add_job(message_deleter, 'interval', minutes = 5)
 
-    scheduler.add_job(party_invite_deleter, 'interval', minutes = 60)
+    scheduler.add_job(party_invite_deleter, 'interval', minutes = 6)
+
+    scheduler.add_job(checkpoint, 'interval', minutes = 30)
 
     for job in scheduler.get_jobs():
         job.modify(next_run_time = datetime.datetime.now())
@@ -32,6 +35,17 @@ async def startup():
     scheduler.start()
     # Start the scheduler
     print("Task scheduler started")
+
+async def checkpoint():
+    try:
+        async with aiosqlite.connect(path) as db:
+            await db.execute("PRAGMA busy_timeout = 5000")
+            cursor = await db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            result = await cursor.fetchall()
+            await cursor.close()
+    except aiosqlite.OperationalError as ex:
+        print(f"checkpoint task error: {ex}")
+
 
 async def run_cache(tables : list):
     if not tables:
@@ -45,19 +59,14 @@ async def message_deleter():
     db = app_instance.db
 
     try:
-        
-       
-
-        cursor = await db.execute(
-            f"DELETE FROM messages WHERE timestamp < ? RETURNING *",
-            (int(time.time() - 300),)
-        )
-
-        new_rows = await cursor.fetchall()
-
-        await cursor.close()
-
-        await db.commit()
+        async with app_instance.db_lock:
+            cursor = await db.execute(
+                f"DELETE FROM messages WHERE timestamp < ? RETURNING *",
+                (int(time.time() - 300),)
+            )
+            new_rows = await cursor.fetchall()
+            await cursor.close()
+            await db.commit()
 
         await deliver("messages", [], [dict(row) for row in new_rows])
 
@@ -70,16 +79,14 @@ async def party_invite_deleter():
     db = app_instance.db
 
     try:
-        cursor = await db.execute(
-            f"DELETE FROM partyInvites WHERE expireTimestamp < ? RETURNING *",
-            (int(time.time()),)
-        )
-
-        new_rows = await cursor.fetchall()
-
-        await cursor.close()
-
-        await db.commit()
+        async with app_instance.db_lock:
+            cursor = await db.execute(
+                f"DELETE FROM partyInvites WHERE expireTimestamp < ? RETURNING *",
+                (int(time.time()),)
+            )
+            new_rows = await cursor.fetchall()
+            await cursor.close()
+            await db.commit()
 
         await deliver("partyInvites", [], [dict(row) for row in new_rows])
 
