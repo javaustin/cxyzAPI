@@ -17,17 +17,15 @@ async def set():
     value = data.get("value")
     version = data.get("version")
 
-    print(data)
-
     try:
         version = int(version)
     except ValueError:
-        return jsonify({"error" : "version must be an integer"}), 400
+        return jsonify({"error": "`version` must be an integer"}), 400
 
     print("version: " + str(version))
 
     if not all([uuid, stat_id, value, version]):
-        return jsonify({"error" : "uuid,  statID, value, version are required"}), 400
+        return jsonify({"error": "`uuid`, `statID`, `value`, and `version` are required arguments"}), 400
 
     db = app_instance.db
 
@@ -54,7 +52,7 @@ async def set():
 
         await deliver("gameStats", rows, [])
 
-        return jsonify({"message" : "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500

@@ -6,7 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="5abbb016-b73f-46dd-ba38-a51537f89c23" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.db-wal" beforeDir="false" afterPath="$PROJECT_DIR$/server.db-wal" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/friendRequests.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/friendRequests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/gameStats.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/gameStats.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/messages.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/messages.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/parties.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/parties.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/partyExpires.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/partyExpires.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/partyInvites.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/partyInvites.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/punishment.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/punishment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/users.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/other/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server.db" beforeDir="false" afterPath="$PROJECT_DIR$/server.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,61 +57,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="1.926912201227685" />
-      <entry key="MS500" value="3.912217124615013" />
-      <entry key="S2" value="11.586697569305061" />
-      <entry key="S5" value="21.672421392829364" />
-      <entry key="S10" value="39.34204067987771" />
-      <entry key="S30" value="116.07344639599118" />
-      <entry key="S60" value="206.46639607880743" />
-      <entry key="M2" value="297.18572133634905" />
-      <entry key="M5" value="381.2317249444573" />
-      <entry key="M10" value="420.63548938798573" />
-      <entry key="M15" value="439.78500172322947" />
-      <entry key="M30" value="481.682963503631" />
-      <entry key="H1" value="562.6678264874959" />
-      <entry key="H2" value="686.7984265676799" />
-      <entry key="H4" value="830.5357569169163" />
-      <entry key="D1" value="1082.3863533046751" />
-      <entry key="W1" value="1149.7678537185795" />
+      <entry key="MS100" value="1.7044097094676085" />
+      <entry key="MS500" value="5.5417460442130935" />
+      <entry key="S2" value="16.452976343971333" />
+      <entry key="S5" value="32.81346159246132" />
+      <entry key="S10" value="58.645463601636024" />
+      <entry key="S30" value="129.41510962901748" />
+      <entry key="S60" value="175.82855885449027" />
+      <entry key="M2" value="211.6886728416983" />
+      <entry key="M5" value="279.5250681410722" />
+      <entry key="M10" value="394.10779199153984" />
+      <entry key="M15" value="477.4252665188972" />
+      <entry key="M30" value="620.2490586116355" />
+      <entry key="H1" value="769.6332407058511" />
+      <entry key="H2" value="937.3162946606672" />
+      <entry key="H4" value="1109.9325554407833" />
+      <entry key="D1" value="1397.4103821094961" />
+      <entry key="W1" value="1473.2525949309243" />
     </decayedCancelled>
     <decayedSelected>
       <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="0.0" />
-      <entry key="S2" value="1.8933408598271385E-118" />
-      <entry key="S5" value="1.2302248127559175E-47" />
-      <entry key="S10" value="4.9595575406293106E-24" />
-      <entry key="S30" value="2.8581490974346417E-8" />
-      <entry key="S60" value="2.896767090817929E-4" />
-      <entry key="M2" value="0.034055605126101944" />
-      <entry key="M5" value="0.6692604937012031" />
-      <entry key="M10" value="2.0670245805997682" />
-      <entry key="M15" value="3.32619577127361" />
-      <entry key="M30" value="6.621845865582387" />
-      <entry key="H1" value="12.639361274622553" />
-      <entry key="H2" value="21.71267788753257" />
-      <entry key="H4" value="32.755335520517136" />
-      <entry key="D1" value="53.30318019023065" />
-      <entry key="W1" value="58.96648996589747" />
+      <entry key="MS500" value="1.8355504292758788E-303" />
+      <entry key="S2" value="2.0770895777570827E-76" />
+      <entry key="S5" value="5.885139978175312E-31" />
+      <entry key="S10" value="9.883363511301492E-16" />
+      <entry key="S30" value="1.8333138073654122E-5" />
+      <entry key="S60" value="0.007868931597877712" />
+      <entry key="M2" value="0.18879160478081272" />
+      <entry key="M5" value="1.6173191778218536" />
+      <entry key="M10" value="4.015524750867477" />
+      <entry key="M15" value="5.947852828511724" />
+      <entry key="M30" value="10.32915979906122" />
+      <entry key="H1" value="17.146013233833084" />
+      <entry key="H2" value="26.969792948001007" />
+      <entry key="H4" value="38.78038593300473" />
+      <entry key="D1" value="60.786580461509466" />
+      <entry key="W1" value="66.88528712820866" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.7766304578993393" />
-      <entry key="MS500" value="3.838020074857898" />
-      <entry key="S2" value="11.524846329177928" />
-      <entry key="S5" value="21.626370700648028" />
-      <entry key="S10" value="39.29879817602563" />
-      <entry key="S30" value="116.02576622421245" />
-      <entry key="S60" value="206.42424660286764" />
-      <entry key="M2" value="297.189046406398" />
-      <entry key="M5" value="381.88079602334705" />
-      <entry key="M10" value="422.6868384650227" />
-      <entry key="M15" value="443.09768752117776" />
-      <entry key="M30" value="488.29332740027814" />
-      <entry key="H1" value="575.2958392592252" />
-      <entry key="H2" value="708.5009961979276" />
-      <entry key="H4" value="863.2835458263174" />
-      <entry key="D1" value="1135.687575974372" />
-      <entry key="W1" value="1208.734037830306" />
+      <entry key="MS100" value="1.5964389644286536" />
+      <entry key="MS500" value="5.476829163297587" />
+      <entry key="S2" value="16.40757004927857" />
+      <entry key="S5" value="32.77744434957769" />
+      <entry key="S10" value="58.61274288492815" />
+      <entry key="S30" value="129.39010260412996" />
+      <entry key="S60" value="175.8182902511512" />
+      <entry key="M2" value="211.85828592470003" />
+      <entry key="M5" value="281.10900009914326" />
+      <entry key="M10" value="398.08813897615795" />
+      <entry key="M15" value="483.3413605315769" />
+      <entry key="M30" value="630.5541586035899" />
+      <entry key="H1" value="786.7607129975637" />
+      <entry key="H2" value="964.2720150003511" />
+      <entry key="H4" value="1148.703214842497" />
+      <entry key="D1" value="1458.1945827522459" />
+      <entry key="W1" value="1540.1375135239562" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -114,39 +125,40 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.csc35project.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.run.executor&quot;: &quot;Run&quot;,
-    &quot;Python.users.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/home/austin/.local/share/JetBrains/PyCharm2026.1/Shell Script/shellcheck&quot;,
-    &quot;ai.playground.ignore.import.keys.banner.in.settings&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/austin/Documents/dev/cxyzAPI&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.csc35project.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.run.executor": "Run",
+    "Python.users.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "/home/austin/.local/share/JetBrains/PyCharm2026.1/Shell Script/shellcheck",
+    "ai.playground.ignore.import.keys.banner.in.settings": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/ayoung9/Documents/dev/cxyzAPI",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "python.packages.toolwindow.project.migrated.to.right.top.v2": "true",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;sqlite&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlite"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\austi\Documents\PycharmProjects\serverAPI\models" />
@@ -167,7 +179,7 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.12 (cxyzAPI)" />
+      <option name="SDK_NAME" value="~\AppData\Local\Python\bin\python.exe" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -211,7 +223,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-c59985aa861c-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.24374.152" />
+        <option value="bundled-python-sdk-eff1e8def5f5-5bd6d13a2a75-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-262.10315.174" />
       </set>
     </attachedChunks>
   </component>
@@ -244,6 +256,7 @@
       <workItem from="1780703436492" duration="1784000" />
       <workItem from="1780888576549" duration="6284000" />
       <workItem from="1783201885336" duration="5000" />
+      <workItem from="1790356881726" duration="2203000" />
     </task>
     <servers />
   </component>

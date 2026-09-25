@@ -17,7 +17,7 @@ async def create():
     expire_timestamp = data.get("expireTimestamp")
 
     if not all([sender, recipient, expire_timestamp]):
-        return jsonify({"error" : "sender, recipient, expire_timestamp is required"}), 400
+        return jsonify({"error": "`sender`, `recipient`, and `expireTimestamp` are required arguments"}), 400
 
     try:
         db = app_instance.db
@@ -30,7 +30,7 @@ async def create():
         await deliver("friendRequests", after_rows, [])
 
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
@@ -52,7 +52,7 @@ async def delete():
 
         await deliver("friendRequests", [], deleted_rows)
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500

@@ -28,11 +28,11 @@ async def create():
         await deliver("partyInvites", after_rows, [])
 
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.IntegrityError:
         # Unique constraint failed
-        return jsonify({"error" : "duplicate uuid"}), 400
+        return jsonify({"error": "`uuid` already exists"}), 400
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
@@ -58,7 +58,7 @@ async def sync():
         await deliver("partyInvites", after_rows, [])
 
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
 
     except aiosqlite.OperationalError as ex:
@@ -84,7 +84,7 @@ async def delete():
         await deliver("partyInvites", [], deleted_rows)
 
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
 
     except aiosqlite.OperationalError as ex:

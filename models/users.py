@@ -12,7 +12,7 @@ user_blueprint = Blueprint('user', __name__, url_prefix = "/user")
 async def get_user(uuid):
 
     if not uuid:
-        return jsonify({"error" : "UUID required"}), 400  # bad request
+        return jsonify({"error": "`uuid` is a required argument"}), 400  # bad request
 
     db = app_instance.db
 
@@ -26,7 +26,7 @@ async def get_user(uuid):
             print(f"[!] At least two rows both contain the same uuid={uuid}!")
 
         if len(rows) == 0:
-            return jsonify({"message" : "User not found!"}), 404
+            return jsonify({"error": "User not found"}), 404
 
         return jsonify(dict(rows[0])), 200
 
@@ -49,7 +49,7 @@ async def get_user_attribute(uuid, attribute):
             print(f"[!] At least two rows both contain the same uuid={uuid}!")
 
         if len(rows) == 0:
-            return jsonify({"message" : "User not found!"}), 404
+            return jsonify({"error": "User not found"}), 404
 
         row : dict = dict(rows[0])
 
@@ -57,7 +57,7 @@ async def get_user_attribute(uuid, attribute):
             return jsonify({attribute : row[attribute]}), 200
 
         except KeyError:
-            return jsonify({"message" : f"Attribute {attribute} does not exist."}), 400
+            return jsonify({"error": f"`{attribute}` is not a valid user attribute"}), 400
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
@@ -70,7 +70,7 @@ async def create():
     uuid = data.get("uuid")
 
     if not uuid:
-        return jsonify({"error" : "UUID required"}), 400
+        return jsonify({"error": "`uuid` is a required argument"}), 400
 
     columns = ', '.join([x for x in data.keys()])
     placeholders = ', '.join(['?'] * len(data.keys()))
@@ -87,11 +87,11 @@ async def create():
 
         await deliver("users", [dict(row) for row in new_rows], [])
 
-        return jsonify({"message": "Operation successful.", "uuid": uuid}), 200
+        return jsonify({"message": "Operation successful", "uuid": uuid}), 200
 
     except aiosqlite.IntegrityError:
         # Unique constraint failed
-        return jsonify({"error" : "duplicate uuid"}), 400
+        return jsonify({"error": "`uuid` already exists"}), 400
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
@@ -106,7 +106,7 @@ async def delete():
     uuid = data.get("uuid")
 
     if not uuid:
-        return jsonify({"message", "UUID required"}), 404
+        return jsonify({"error": "`uuid` is a required argument"}), 404
 
     db = app_instance.db
 
@@ -117,7 +117,7 @@ async def delete():
 
             if len(new_rows) == 0:
                 await cursor.close()
-                return jsonify({"error" : "No user found", "uuid": uuid}), 404
+                return jsonify({"error": "User not found", "uuid": uuid}), 404
 
             await cursor.close()
             await db.commit()
@@ -129,14 +129,14 @@ async def delete():
         return jsonify({"error" : str(ex)}), 500
 
 
-    return jsonify({"message": "Operation successful.", "uuid": uuid}), 200
+    return jsonify({"message": "Operation successful", "uuid": uuid}), 200
 
 @user_blueprint.route("/modify", methods=["POST"])
 async def modify():
     data = await request.get_json()
 
     if not data:
-        return jsonify({"error" : "No data provided"}), 400  # bad request
+        return jsonify({"error": "`data` is a required argument"}), 400  # bad request
 
     columns = ", ".join([f"{key} = ?" for key in data.keys()])
     values = list(data.values())
@@ -146,13 +146,13 @@ async def modify():
     try:
         version = int(version)
     except ValueError:
-        return jsonify({"error" : "version must be an integer"}), 400
+        return jsonify({"error": "`version` must be an integer"}), 400
 
     if not uuid:
-        return jsonify({"error" : "user must have a uuid"}), 400
+        return jsonify({"error": "`uuid` is a required argument"}), 400
 
     if version is None:
-        return jsonify({"error" : "user must have a version"}), 400
+        return jsonify({"error": "`version` is a required argument"}), 400
 
     db = app_instance.db
 
@@ -172,4 +172,4 @@ async def modify():
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
 
-    return jsonify({"message": "Operation successful.", "uuid" : uuid}), 200
+    return jsonify({"message": "Operation successful", "uuid": uuid}), 200

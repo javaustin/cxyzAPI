@@ -1,5 +1,5 @@
 {
-  "db-path" : "/home/austin/Documents/dev/cxyzAPI/server.db",
+  "db-path" : "C:/Users/ayoung9/Documents/dev/cxyzAPI/server.db",
 
   "quart-host" : "0.0.0.0",
   "quart-port" : 5000,

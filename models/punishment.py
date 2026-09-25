@@ -30,7 +30,7 @@ async def set():
     punishment : dict = data.get("punishment")
 
     if "message" in punishment.keys():
-        return {"message" : punishment.get("message")}, 400
+        return {"error": punishment.get("message")}, 400
 
     last_id = await get_sequence_id()
 
@@ -68,7 +68,7 @@ async def set():
         else:
             await deliver("punishments", new_rows, [])
 
-        return jsonify({"message": "Operation successful!", "punishment": punishment}), 200
+        return jsonify({"message": "Operation successful", "punishment": punishment}), 200
 
 
     except aiosqlite.OperationalError as ex:
@@ -95,7 +95,7 @@ async def delete():
         await deliver("punishments", [], deleted_rows)
 
 
-        return jsonify({"message": "Operation successful!", "punishment": punishment}), 200
+        return jsonify({"message": "Operation successful", "punishment": punishment}), 200
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
@@ -111,10 +111,10 @@ async def edit():
     case_id = punishment.get("id")
 
     if not case_id:
-        return jsonify({"message": "id cannot be null"}), 400
+        return jsonify({"error": "`id` is a required argument"}), 400
 
     if punishment is None:
-        return {"message": f"punishment with id={case_id} can't be found"}, 404
+        return {"error": f"Punishment with id={case_id} not found"}, 404
 
     columns = ', '.join([f"{key} = ?" for key in punishment])
     values = list(punishment.values())
@@ -130,7 +130,7 @@ async def edit():
 
             if len(new_rows) == 0:
                 await cursor.close()
-                return jsonify({"message": "No row found"}), 404
+                return jsonify({"error": "Punishment not found"}), 404
 
             await cursor.close()
             await db.commit()
@@ -142,7 +142,7 @@ async def edit():
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
 
-    return jsonify({"message" : "Operation successful!", "punishment" : punishment}), 200
+    return jsonify({"message": "Operation successful", "punishment": punishment}), 200
 
 @punishment_blueprint.route("/clear", methods=["POST"])
 async def clear():
@@ -151,7 +151,7 @@ async def clear():
     uuid : str = data.get("uuid")
 
     if not uuid:
-        return jsonify({"message": "uuid cannot be null"}), 400
+        return jsonify({"error": "`uuid` is a required argument"}), 400
 
     db = app_instance.db
 
@@ -168,7 +168,7 @@ async def clear():
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
 
-    return jsonify({"message" : "Operation successful!"}), 200
+    return jsonify({"message": "Operation successful"}), 200
 
 
 __all__ = ["punishment_blueprint"]

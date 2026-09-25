@@ -32,6 +32,7 @@ async def authorize():
         await authenticate_request(request)
 
     except AuthenticationFailException as ex:
+        print(f"Authentication failed for the above request! (Reason: {ex})")
         return jsonify({"error" : str(ex)}), 401
 
     return None
@@ -43,8 +44,6 @@ async def home():
 @app.route("/sql", methods = ["POST"])
 async def sql():
     data = await request.get_json()
-
-    # note: instead of only determining if a table is involved, let's rather determine whether the statement modifies rows (UPDATE, INSERT)
 
     if not data:
         return jsonify({"error" : "No request body supplied."}), 400
@@ -69,8 +68,7 @@ async def sql():
             re.IGNORECASE
         )
         table = match.group(1) if match else None
-        
-        print(query)
+
         should_push : bool = query.upper().startswith("INSERT") or query.upper().startswith("UPDATE") or query.upper().startswith("DELETE") or query.upper().startswith("REPLACE")
 
         if table and should_push:
@@ -80,7 +78,6 @@ async def sql():
             return jsonify({"error" : "Could not fulfill push because the SQL query does not include a table."}), 400
 
         res = [dict(row) for row in rows]
-        print(res)
 
         return jsonify(res), 200
 

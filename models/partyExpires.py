@@ -16,7 +16,7 @@ async def create():
     timestamp = data.get("timestamp")
 
     if not all([uuid, timestamp]):
-        return jsonify({"error" : "uuid, timestamp is required"}), 400
+        return jsonify({"error": "`uuid` and `timestamp` are required arguments"}), 400
 
     db = app_instance.db
 
@@ -29,7 +29,7 @@ async def create():
 
         await deliver("partyExpires", after_rows, [])
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
@@ -43,7 +43,7 @@ async def sync():
     timestamp = data.get("timestamp")
 
     if not all([uuid, timestamp]):
-        return jsonify({"error" : "uuid, timestamp is required"}), 400
+        return jsonify({"error": "`uuid` and `timestamp` are required arguments"}), 400
 
     db = app_instance.db
 
@@ -57,7 +57,7 @@ async def sync():
         await deliver("partyExpires", after_rows, [])
 
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
@@ -81,7 +81,7 @@ async def delete():
         await deliver("partyExpires", [], deleted_rows)
 
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500

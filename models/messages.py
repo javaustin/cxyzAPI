@@ -22,7 +22,7 @@ async def submit():
     timestamp = data.get("timestamp")
 
     if not all([sender_uuid, sender_name, recipient_uuid, recipient_name, timestamp]): # We exclude 'content' because we allow that to be null
-        return jsonify({"error" : "Missing required parameters"}), 400
+        return jsonify({"error": "`sender_uuid`, `sender_name`, `recipient_uuid`, `recipient_name`, and `timestamp` are required arguments"}), 400
 
     columns = ", ".join(data.keys())
     values = list(data.values())
@@ -44,7 +44,7 @@ async def submit():
         await deliver("messages", [dict(row) for row in new_rows], [dict(row) for row in old_rows])
 
 
-        return jsonify({"message": "Operation successful.", "message_data": data}), 200
+        return jsonify({"message": "Operation successful", "message_data": data}), 200
     # sender_uuid, sender_name, recipient_uuid, recipient_name, content, timestamp
 
     except aiosqlite.OperationalError as ex:
@@ -132,7 +132,7 @@ async def delete():
             params.append(timestamp)
 
         if len(filters) == 0:
-            return jsonify({"error" : "Please specify any of the following arguments: sender_uuid, recipient_uuid, content, timestamp"}), 400
+            return jsonify({"error": "At least one of `sender_uuid`, `recipient_uuid`, `content`, or `timestamp` is required"}), 400
 
         async with app_instance.db_lock:
             cursor = await db.execute(f"DELETE FROM messages WHERE {'AND '.join(filters)} RETURNING *", params)
@@ -142,7 +142,7 @@ async def delete():
 
         await deliver("messages", [], [dict(row) for row in new_rows])
 
-        return jsonify({"message": f"Operation successful. {len(new_rows)} rows affected."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500

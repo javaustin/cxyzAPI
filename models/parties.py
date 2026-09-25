@@ -17,7 +17,7 @@ async def create():
     public = data.get("public")
 
     if not sender_uuid:
-        return jsonify({"error" : "uuid is required"}), 400
+        return jsonify({"error": "`sender_uuid` is a required argument"}), 400
 
     db = app_instance.db
 
@@ -31,11 +31,11 @@ async def create():
         await deliver("parties", after_rows, [])
 
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.IntegrityError:
         # Unique constraint failed
-        return jsonify({"error" : "duplicate uuid"}), 400
+        return jsonify({"error": "`sender_uuid` already exists"}), 400
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
@@ -51,7 +51,7 @@ async def sync():
     public = data.get("public")
 
     if not sender_uuid:
-        return jsonify({"error" : "uuid is required"}), 400
+        return jsonify({"error": "`sender_uuid` is a required argument"}), 400
 
     db = app_instance.db
 
@@ -65,7 +65,7 @@ async def sync():
         await deliver("parties", after_rows, [])
 
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 500
@@ -89,7 +89,7 @@ async def delete():
         await deliver("parties", [], deleted_rows)
 
 
-        return jsonify({"message": "Operation successful."}), 200
+        return jsonify({"message": "Operation successful"}), 200
 
 
     except aiosqlite.OperationalError as ex:

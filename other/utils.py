@@ -128,6 +128,8 @@ async def authenticate_request(request : quart.app.Request):
     urlpath : str = request.path
     method : str = request.method
 
+    print(f"- Authenticating {method} '{urlpath}' from '{identifier}' with {f"payload:\n{payload}" if len(payload) > 0 else "no body."}")
+
     if identifier is None:
         raise AuthenticationFailException("\"X-Identifier\" is required for interacting with this service.")
 
@@ -142,7 +144,6 @@ async def authenticate_request(request : quart.app.Request):
 
     except Exception:
         raise AuthenticationFailException("Timestamp is invalid.")
-
 
     if (abs(time.time()) - abs(provided_timestamp)) > 30:
         raise AuthenticationFailException("Request timestamp expired.")
