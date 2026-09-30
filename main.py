@@ -1,5 +1,6 @@
 import json
 import re
+import sys
 
 import app_instance
 import other.utils
@@ -26,6 +27,14 @@ from other.utils import authenticate_request, DeliveryService, quart_host, quart
 # - For operation successful, standardize putting the amount of rows affected such as: {message : "{len(new_rows)} rows affected."}
 # - Make sure sql operation errors return a 400 error code, not 500
 
+@app.route("/", methods=["GET", "POST"])
+async def home():
+    return jsonify({"message" : "Welcome to my web server!"})
+
+@app.before_serving
+async def startup():
+    app.console_task = asyncio.create_task(console())
+
 @app.before_request
 async def authorize():
     try:
@@ -36,10 +45,6 @@ async def authorize():
         return jsonify({"error" : str(ex)}), 401
 
     return None
-
-@app.route("/", methods=["GET", "POST"])
-async def home():
-    return jsonify({"message" : "Welcome to my web server!"})
 
 @app.route("/sql", methods = ["POST"])
 async def sql():
@@ -157,6 +162,18 @@ async def seq(table):
 
     except aiosqlite.OperationalError as ex:
         return jsonify({"error" : str(ex)}), 400
+
+async def console():
+
+    while True:
+        line = await asyncio.to_thread(sys.stdin.readline)
+
+        if not line:
+            return
+
+        command = line.strip()
+
+        print("Received command: " + command)
 
 
 app.register_blueprint(parties.party_blueprint)
