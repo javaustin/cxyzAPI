@@ -5,11 +5,12 @@ import json
 import time
 from urllib.parse import urlparse
 
+import aiosqlite
 import httpx
 import quart.app
 
 import app_instance
-from other.errors import AuthenticationFailException
+from other.errors import AuthenticationFailException, DuplicateRequestException, MissingHeadersException
 from other.servers import Server
 
 
@@ -117,6 +118,29 @@ def generate_signature(identifier : str, secret : str, timestamp : int, method :
     return signature
 
 
+async def preprocess_request(request : quart.app.Request):
+    await authenticate_request(request)
+    await check_is_unique(request)
+
+    return None
+
+async def postprocess_request(original_request : quart.app.Request, response : quart.app.Response):
+
+    status_code : int = response.status_code
+    response_body = await response.get_data(as_text = True)
+
+    request_id = original_request.headers.get("X-Request-ID")
+
+    db = app_instance.db
+    async with app_instance.db_lock:
+        cursor = await db.execute(
+            """UPDATE requests SET status_code = ?, response_body = ? WHERE request_id = ?""",
+                                  (status_code, response_body, request_id,)
+        )
+
+        await cursor.close()
+        await db.commit()
+
 async def authenticate_request(request : quart.app.Request):
 
     data = await request.get_data(as_text = True)
@@ -131,13 +155,13 @@ async def authenticate_request(request : quart.app.Request):
     print(f"- Authenticating {method} '{urlpath}' from '{identifier}' with {f"payload:\n{payload}" if len(payload) > 0 else "no body."}")
 
     if identifier is None:
-        raise AuthenticationFailException("\"X-Identifier\" is required for interacting with this service.")
+        raise MissingHeadersException("\"X-Identifier\" is required for interacting with this service.")
 
     if timestamp_string is None:
-        raise AuthenticationFailException("\"X-Timestamp\" is required for interacting with this service.")
+        raise MissingHeadersException("\"X-Timestamp\" is required for interacting with this service.")
 
     if signature is None:
-        raise AuthenticationFailException("\"X-Signature\" is required for interacting with this service.")
+        raise MissingHeadersException("\"X-Signature\" is required for interacting with this service.")
 
     try:
         provided_timestamp : int = int(timestamp_string)
@@ -151,7 +175,7 @@ async def authenticate_request(request : quart.app.Request):
     server = Server.get_server(identifier)
 
     if server is None:
-        raise AuthenticationFailException(f"No service with identifier '{identifier}' is registered in config.json.")
+        raise AuthenticationFailException(f"No service with identifier '{identifier}' is registered in the API config.")
 
     local_signature = generate_signature(
         identifier = server.identifier,
@@ -166,4 +190,40 @@ async def authenticate_request(request : quart.app.Request):
         raise AuthenticationFailException("Signature is invalid.")
 
 
-    return None
+async def check_is_unique(request : quart.app.Request):
+
+    data = await request.get_data(as_text = True)
+
+    request_id = request.headers.get("X-Request-ID", None)
+    request_body : str = data
+    identifier = request.headers.get("X-Identifier", None)
+    timestamp_string  = request.headers.get("X-Timestamp")
+    urlpath : str = request.path
+    method : str = request.method
+
+    if identifier is None:
+        raise MissingHeadersException("\"X-Identifier\" is required for interacting with this service.")
+
+    if timestamp_string is None:
+        raise MissingHeadersException("\"X-Timestamp\" is required for interacting with this service.")
+
+    if request_id is None:
+        raise MissingHeadersException("\"X-Request-ID\" is required for interacting with this service.")
+
+    timestamp = int(timestamp_string)
+
+    try:
+        db = app_instance.db
+        async with app_instance.db_lock:
+            cursor = await db.execute(
+                """INSERT INTO requests 
+                   (request_id, path, method, timestamp, server_id, ip_address, request_body, status_code, response_body) 
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (request_id, urlpath, method, timestamp, identifier, request.remote_addr, json.dumps(request_body), 0, "",)
+            )
+
+            await cursor.close()
+            await db.commit()
+
+    except aiosqlite.IntegrityError:
+        raise DuplicateRequestException(f"Request with ID={request_id} already exists.")

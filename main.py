@@ -11,21 +11,10 @@ import aiosqlite
 from quart import jsonify, request
 
 from app_instance import app
-from other.errors import AuthenticationFailException
+from other.errors import AuthenticationFailException, MissingHeadersException, DuplicateRequestException
 from other.servers import Server
 from other.tasks import run_cache
-from other.utils import authenticate_request, DeliveryService, quart_host, quart_port
-
-# Each server, including the API, has a unique identifier and a secret.
-# Each game server authenticates requests to the API by sending an identifier, a timestamp, and a signature computed from (identifier, timestamp, request-method, url-path, json-payload).
-# The game server never sends its secret directly to the API.
-# The API already has the corresponding game server secret associated with the provided identifier.
-# Upon receiving a request, the API recomputes the expected signature using the received fields and the stored secret, and verifies it matches the signature included in the request.
-
-# Notes
-# - Standardize messages for: duplicate entry, missing required arguments, ...
-# - For operation successful, standardize putting the amount of rows affected such as: {message : "{len(new_rows)} rows affected."}
-# - Make sure sql operation errors return a 400 error code, not 500
+from other.utils import preprocess_request, postprocess_request, DeliveryService, quart_host, quart_port
 
 @app.route("/", methods=["GET", "POST"])
 async def home():
@@ -36,15 +25,27 @@ async def startup():
     app.console_task = asyncio.create_task(console())
 
 @app.before_request
-async def authorize():
+async def preprocess():
     try:
-        await authenticate_request(request)
+        await preprocess_request(request)
+
+    except MissingHeadersException as ex:
+        return jsonify({"error": str(ex)}), 401
 
     except AuthenticationFailException as ex:
-        print(f"Authentication failed for the above request! (Reason: {ex})")
-        return jsonify({"error" : str(ex)}), 401
+        print(f"Authentication failed for the above request! Reason: {ex}")
+        return jsonify({"error" : str(ex)}), 403
+
+    except DuplicateRequestException as ex:
+        return jsonify({"error": str(ex)}), 409
 
     return None
+
+@app.after_request
+async def after_request(response):
+    await postprocess_request(request, response)
+
+    return response
 
 @app.route("/sql", methods = ["POST"])
 async def sql():

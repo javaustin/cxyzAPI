@@ -32,7 +32,7 @@ async def create():
         return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 @expire_blueprint.route("/sync", methods=["POST"])
@@ -60,7 +60,7 @@ async def sync():
         return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 @expire_blueprint.route("/delete", methods=["POST"])
@@ -84,7 +84,7 @@ async def delete():
         return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #

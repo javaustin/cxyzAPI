@@ -32,7 +32,7 @@ async def get_user(uuid):
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 @user_blueprint.route("/get_user_attribute/<uuid>/<attribute>", methods=["GET"])
 async def get_user_attribute(uuid, attribute):
@@ -60,7 +60,7 @@ async def get_user_attribute(uuid, attribute):
             return jsonify({"error": f"`{attribute}` is not a valid user attribute"}), 400
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 @user_blueprint.route("/create", methods=["POST"])
@@ -94,7 +94,7 @@ async def create():
         return jsonify({"error": "`uuid` already exists"}), 400
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 
@@ -126,7 +126,7 @@ async def delete():
         await deliver("users", [], [dict(row) for row in new_rows])
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
     return jsonify({"message": "Operation successful", "uuid": uuid}), 200
@@ -170,6 +170,6 @@ async def modify():
         await deliver("users", [dict(row) for row in new_rows], [])
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
     return jsonify({"message": "Operation successful", "uuid": uuid}), 200

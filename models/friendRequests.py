@@ -33,7 +33,7 @@ async def create():
         return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 @friend_request_blueprint.route("/delete", methods=["POST"])
 async def delete():
@@ -55,7 +55,7 @@ async def delete():
         return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
 __all__ = ["friend_request_blueprint"]

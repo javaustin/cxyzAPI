@@ -55,7 +55,7 @@ async def set():
         return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #

@@ -38,7 +38,7 @@ async def create():
         return jsonify({"error": "`sender_uuid` already exists"}), 400
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 
@@ -68,7 +68,7 @@ async def sync():
         return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 @party_blueprint.route("/delete", methods=["POST"])
@@ -93,7 +93,7 @@ async def delete():
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #

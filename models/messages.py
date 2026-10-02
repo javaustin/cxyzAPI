@@ -48,7 +48,7 @@ async def submit():
     # sender_uuid, sender_name, recipient_uuid, recipient_name, content, timestamp
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 @message_blueprint.route("/query", methods=["POST"])  # similar to get request
 async def query():
@@ -97,7 +97,7 @@ async def query():
         return jsonify({"messages": [dict(row) for row in rows]}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 @message_blueprint.route("/delete", methods=["POST"])  # similar to get request
 async def delete():
@@ -145,7 +145,7 @@ async def delete():
         return jsonify({"message": "Operation successful"}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #

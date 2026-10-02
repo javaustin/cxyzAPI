@@ -72,7 +72,7 @@ async def set():
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 @punishment_blueprint.route("/delete", methods = ["POST"])
@@ -98,7 +98,7 @@ async def delete():
         return jsonify({"message": "Operation successful", "punishment": punishment}), 200
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 @punishment_blueprint.route("/edit", methods=["POST"])
@@ -140,7 +140,7 @@ async def edit():
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
     return jsonify({"message": "Operation successful", "punishment": punishment}), 200
 
@@ -166,7 +166,7 @@ async def clear():
         await deliver("punishments", [], [dict(row) for row in deleted_rows])
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
     return jsonify({"message": "Operation successful"}), 200
 

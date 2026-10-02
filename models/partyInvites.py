@@ -35,7 +35,7 @@ async def create():
         return jsonify({"error": "`uuid` already exists"}), 400
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 @invite_blueprint.route("/sync", methods=["POST"])
@@ -62,7 +62,7 @@ async def sync():
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 @invite_blueprint.route("/delete", methods=["POST"])
@@ -88,7 +88,7 @@ async def delete():
 
 
     except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : str(ex)}), 500
+        return jsonify({"error" : str(ex)}), 400
 
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= #
