@@ -5,20 +5,33 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5abbb016-b73f-46dd-ba38-a51537f89c23" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/command.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/commands/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/commands/hello.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/deliveries.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/requests.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/tasks.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/tracking.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app_instance.py" beforeDir="false" afterPath="$PROJECT_DIR$/app_instance.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/friendRequests.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/friendRequests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/gameStats.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/gameStats.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/local/requestlog.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/messages.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/messages.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/parties.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/parties.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/partyExpires.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/partyExpires.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/partyInvites.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/partyInvites.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/punishment.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/punishment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/users.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/other/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/other/errors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/other/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/other/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.db" beforeDir="false" afterPath="$PROJECT_DIR$/server.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/friendRequests.py" beforeDir="false" afterPath="$PROJECT_DIR$/endpoints/friendRequests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/gameStats.py" beforeDir="false" afterPath="$PROJECT_DIR$/endpoints/gameStats.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/messages.py" beforeDir="false" afterPath="$PROJECT_DIR$/endpoints/messages.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/parties.py" beforeDir="false" afterPath="$PROJECT_DIR$/endpoints/parties.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/partyExpires.py" beforeDir="false" afterPath="$PROJECT_DIR$/endpoints/partyExpires.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/partyInvites.py" beforeDir="false" afterPath="$PROJECT_DIR$/endpoints/partyInvites.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/punishment.py" beforeDir="false" afterPath="$PROJECT_DIR$/endpoints/punishment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/models/users.py" beforeDir="false" afterPath="$PROJECT_DIR$/endpoints/users.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/errors.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/servers.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/servers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/tasks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/other/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,59 +73,59 @@
     <decayedCancelled>
       <entry key="MS100" value="1.0" />
       <entry key="MS500" value="1.0" />
-      <entry key="S2" value="1.0" />
-      <entry key="S5" value="1.0" />
-      <entry key="S10" value="1.0000000416403863" />
-      <entry key="S30" value="1.057928536790767" />
-      <entry key="S60" value="3.035859804136828" />
-      <entry key="M2" value="13.254542505602277" />
-      <entry key="M5" value="39.08894725386799" />
-      <entry key="M10" value="65.94694485113986" />
-      <entry key="M15" value="91.18922494754491" />
-      <entry key="M30" value="195.842293302755" />
-      <entry key="H1" value="442.3119313045267" />
-      <entry key="H2" value="798.4222761204517" />
-      <entry key="H4" value="1164.7223716948506" />
-      <entry key="D1" value="1742.1630235999191" />
-      <entry key="W1" value="1891.0688624099955" />
+      <entry key="S2" value="1.000000596916804" />
+      <entry key="S5" value="1.0093869494868368" />
+      <entry key="S10" value="1.2562844977463261" />
+      <entry key="S30" value="3.8424445464465555" />
+      <entry key="S60" value="6.648470228861731" />
+      <entry key="M2" value="10.475650216968845" />
+      <entry key="M5" value="41.94385496736252" />
+      <entry key="M10" value="113.09164291215505" />
+      <entry key="M15" value="174.82278032100425" />
+      <entry key="M30" value="329.1508964108" />
+      <entry key="H1" value="597.6273911597483" />
+      <entry key="H2" value="1047.4843401086544" />
+      <entry key="H4" value="1618.0087697849951" />
+      <entry key="D1" value="2672.243675805306" />
+      <entry key="W1" value="2966.058055185947" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="0.0" />
-      <entry key="MS500" value="1.6986070108833094E-248" />
-      <entry key="S2" value="1.85040403997694E-62" />
-      <entry key="S5" value="3.0630558680454095E-25" />
-      <entry key="S10" value="7.861105238473531E-13" />
-      <entry key="S30" value="1.6192626203076233E-4" />
-      <entry key="S60" value="0.021115083150864248" />
-      <entry key="M2" value="0.2668324127377607" />
-      <entry key="M5" value="2.2874805708058337" />
-      <entry key="M10" value="8.605243650868829" />
-      <entry key="M15" value="15.686740893842474" />
-      <entry key="M30" value="33.54439869215" />
-      <entry key="H1" value="56.09283062970212" />
-      <entry key="H2" value="80.25891113140652" />
-      <entry key="H4" value="103.68595728374102" />
-      <entry key="D1" value="142.54627977154757" />
-      <entry key="W1" value="153.0751074083714" />
+      <entry key="MS100" value="1.1509629269863498E-183" />
+      <entry key="MS500" value="2.5835226128219762E-37" />
+      <entry key="S2" value="7.159781717460889E-10" />
+      <entry key="S5" value="2.4413905091689265E-4" />
+      <entry key="S10" value="0.01994953470175693" />
+      <entry key="S30" value="0.47119700167519324" />
+      <entry key="S60" value="1.1430787582077637" />
+      <entry key="M2" value="1.8325305379259134" />
+      <entry key="M5" value="2.6785593287755196" />
+      <entry key="M10" value="4.11289080559131" />
+      <entry key="M15" value="5.69516510776377" />
+      <entry key="M30" value="11.405624302890287" />
+      <entry key="H1" value="28.192948780681284" />
+      <entry key="H2" value="61.87541933115854" />
+      <entry key="H4" value="104.4121711632436" />
+      <entry key="D1" value="182.16622544795985" />
+      <entry key="W1" value="203.98226679473174" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="0.03564886612088823" />
-      <entry key="MS500" value="0.5133447728599995" />
-      <entry key="S2" value="0.8464519036463619" />
-      <entry key="S5" value="0.9354938018635298" />
-      <entry key="S10" value="0.9672093270671911" />
-      <entry key="S30" value="1.0470212245088042" />
-      <entry key="S60" value="3.050829515616156" />
-      <entry key="M2" value="13.515261692142586" />
-      <entry key="M5" value="41.36430497307478" />
-      <entry key="M10" value="74.52738600309841" />
-      <entry key="M15" value="106.84189134508054" />
-      <entry key="M30" value="229.34225438284545" />
-      <entry key="H1" value="498.3620625884278" />
-      <entry key="H2" value="878.6479781243881" />
-      <entry key="H4" value="1268.3860030069147" />
-      <entry key="D1" value="1884.7041013923042" />
-      <entry key="W1" value="2044.1431722310463" />
+      <entry key="MS100" value="0.40053493879481106" />
+      <entry key="MS500" value="0.8327757708805489" />
+      <entry key="S2" value="0.9552834881011677" />
+      <entry key="S5" value="0.9910089864154796" />
+      <entry key="S10" value="1.2531504160322677" />
+      <entry key="S30" value="4.215345651187002" />
+      <entry key="S60" value="7.684060705017147" />
+      <entry key="M2" value="12.227244227882382" />
+      <entry key="M5" value="44.57752050830274" />
+      <entry key="M10" value="117.17384614810503" />
+      <entry key="M15" value="180.49164829209266" />
+      <entry key="M30" value="340.53261203048754" />
+      <entry key="H1" value="625.793154215958" />
+      <entry key="H2" value="1109.330851270074" />
+      <entry key="H4" value="1722.3966890427987" />
+      <entry key="D1" value="2854.402916566687" />
+      <entry key="W1" value="3170.039208945443" />
     </decayedShown>
   </component>
   <component name="ProblemsViewState">
@@ -126,48 +139,49 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.csc35project.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.run.executor&quot;: &quot;Run&quot;,
-    &quot;Python.users.executor&quot;: &quot;Run&quot;,
-    &quot;Python.utils.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHELLCHECK.PATH&quot;: &quot;/home/austin/.local/share/JetBrains/PyCharm2026.1/Shell Script/shellcheck&quot;,
-    &quot;ai.playground.ignore.import.keys.banner.in.settings&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/ayoung9/Documents/dev/cxyzAPI&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.jshint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.jshint&quot;: &quot;&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;python.packages.toolwindow.project.migrated.to.right.top.v2&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.csc35project.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.run.executor": "Run",
+    "Python.users.executor": "Run",
+    "Python.utils.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHELLCHECK.PATH": "/home/austin/.local/share/JetBrains/PyCharm2026.1/Shell Script/shellcheck",
+    "ai.playground.ignore.import.keys.banner.in.settings": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/ayoung9/Documents/dev/cxyzAPI",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "python.packages.toolwindow.project.migrated.to.right.top.v2": "true",
+    "settings.editor.selected.configurable": "terminal",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;sqlite&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "sqlite"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\austi\Documents\PycharmProjects\serverAPI\models" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ayoung9\Documents\dev\cxyzAPI" />
       <recent name="C:\Users\ayoung9\Documents\dev\cxyzAPI\other" />
       <recent name="C:\Users\austi\Documents\PycharmProjects\serverAPI\models" />
       <recent name="C:\Users\austi\Documents\PycharmProjects\serverAPI\requests" />
@@ -266,7 +280,9 @@
       <workItem from="1790876664897" duration="2173000" />
       <workItem from="1790878888615" duration="2729000" />
       <workItem from="1790964790914" duration="2934000" />
-      <workItem from="1790968064440" duration="924000" />
+      <workItem from="1790968064440" duration="1723000" />
+      <workItem from="1791324560270" duration="115000" />
+      <workItem from="1791480671498" duration="9363000" />
     </task>
     <servers />
   </component>
@@ -285,7 +301,7 @@
     </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/cxyzAPI$run.coverage" NAME="run Coverage Results" MODIFIED="1790880137230" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/cxyzAPI$run.coverage" NAME="run Coverage Results" MODIFIED="1791490420464" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/cxyzAPI$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1771284158457" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
     <SUITE FILE_PATH="coverage/cxyzAPI$main.coverage" NAME="main Coverage Results" MODIFIED="1790968650005" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/scripts" />
     <SUITE FILE_PATH="coverage/cxyzAPI$utils.coverage" NAME="utils Coverage Results" MODIFIED="1790968266609" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/other" />

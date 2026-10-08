@@ -1,20 +1,34 @@
 import json
 import re
 import sys
+from logging import shutdown
+
+from rich import print
 
 import app_instance
-import other.utils
-from models import messages, parties, partyInvites, partyExpires, punishment, users, friendRequests, gameStats
+import command, commands
+
+from hypercorn.asyncio import serve
+from hypercorn.config import Config
 
 import asyncio
 import aiosqlite
 from quart import jsonify, request
 
 from app_instance import app
-from other.errors import AuthenticationFailException, MissingHeadersException, DuplicateRequestException
-from other.servers import Server
-from other.tasks import run_cache
-from other.utils import preprocess_request, postprocess_request, DeliveryService, quart_host, quart_port
+from endpoints import partyExpires, parties, partyInvites, users, punishment, messages, friendRequests, gameStats
+from utils.config import quart_host, quart_port
+from utils.deliveries import DeliveryService, deliver
+from utils.errors import AuthenticationFailException, MissingHeadersException, DuplicateRequestException
+from utils.tracking import preprocess_request, log_after_request
+from utils.servers import Server
+from utils.tasks import run_cache
+
+def get(key : str):
+    with open("config.json", "r") as f:
+        data = json.load(f)
+
+        return data.get(key)
 
 @app.route("/", methods=["GET", "POST"])
 async def home():
@@ -33,7 +47,7 @@ async def preprocess():
         return jsonify({"error": str(ex)}), 401
 
     except AuthenticationFailException as ex:
-        print(f"Authentication failed for the above request! Reason: {ex}")
+        print(f"[red]Authentication failed for the above request! Reason: {ex}[/red]")
         return jsonify({"error" : str(ex)}), 403
 
     except DuplicateRequestException as ex:
@@ -43,7 +57,7 @@ async def preprocess():
 
 @app.after_request
 async def after_request(response):
-    await postprocess_request(request, response)
+    await log_after_request(request, response)
 
     return response
 
@@ -78,7 +92,7 @@ async def sql():
         should_push : bool = query.upper().startswith("INSERT") or query.upper().startswith("UPDATE") or query.upper().startswith("DELETE") or query.upper().startswith("REPLACE")
 
         if table and should_push:
-            await other.utils.deliver(table, [dict(row) for row in rows], [dict(row) for row in rows])
+            await deliver(table, [dict(row) for row in rows], [dict(row) for row in rows])
 
         elif not table:
             return jsonify({"error" : "Could not fulfill push because the SQL query does not include a table."}), 400
@@ -99,7 +113,7 @@ async def cache():
     tables = data.get("tables")
 
     if not tables:
-        tables = DeliveryService.tables
+        tables = DeliveryService.tables_to_deliver
     else:
         tables = json.loads(tables)
 
@@ -133,7 +147,7 @@ async def mark_offline():
 
         # If we don't know exactly what kind of query we are receiving, we can simply provide the same rows.
         # The plugin will delete (by key) what we mark as old data, and put in new data. So in effect we just modified the data.
-        await other.utils.deliver("users", [dict(row) for row in new_rows], [dict(row) for row in new_rows])
+        await deliver("users", [dict(row) for row in new_rows], [dict(row) for row in new_rows])
 
         if new_rows is None:
             return jsonify({"message": "Operation successful!"}), 200
@@ -165,16 +179,13 @@ async def seq(table):
         return jsonify({"error" : str(ex)}), 400
 
 async def console():
-
     while True:
         line = await asyncio.to_thread(sys.stdin.readline)
 
-        if not line:
-            return
-
-        command = line.strip()
-
-        print("Received command: " + command)
+        try:
+            await command.execute(line)
+        except Exception as ex:
+            print(f"[red]Command failed: {ex}[/red]")
 
 
 app.register_blueprint(parties.party_blueprint)
@@ -186,5 +197,12 @@ app.register_blueprint(messages.message_blueprint)
 app.register_blueprint(friendRequests.friend_request_blueprint)
 app.register_blueprint(gameStats.game_stats_blueprint)
 
+print(f"[green]Loaded blueprints:[/green] {list(app.blueprints.keys())}")
+
 if __name__ == "__main__":
-    app.run(host = quart_host, port = quart_port, debug = False, use_reloader = False)
+    config = Config()
+    config.bind = [f"{quart_host}:{quart_port}"]
+
+    config.accesslog = None
+
+    asyncio.run(serve(app, config))
