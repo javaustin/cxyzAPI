@@ -1,12 +1,11 @@
 import json
 import re
 import sys
-from logging import shutdown
 
 from rich import print
 
 import app_instance
-import command, commands
+import commands as cmds
 
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
@@ -23,6 +22,9 @@ from utils.errors import AuthenticationFailException, MissingHeadersException, D
 from utils.tracking import preprocess_request, log_after_request
 from utils.servers import Server
 from utils.tasks import run_cache
+from utils.commands import execute_command
+
+shutdown_event = asyncio.Event()
 
 def get(key : str):
     with open("config.json", "r") as f:
@@ -60,50 +62,6 @@ async def after_request(response):
     await log_after_request(request, response)
 
     return response
-
-@app.route("/sql", methods = ["POST"])
-async def sql():
-    data = await request.get_json()
-
-    if not data:
-        return jsonify({"error" : "No request body supplied."}), 400
-
-    query = data.get("query")
-
-    if not query:
-        return jsonify({"error" : "`query` is required."}), 400
-
-    try:
-        db = app_instance.db
-
-        async with app_instance.db_lock:
-            cursor = await db.execute(query)
-            rows = await cursor.fetchall()
-            await cursor.close()
-            await db.commit()
-
-        match = re.search(
-            r"(?:FROM|INTO|UPDATE)\s+([a-zA-Z_][a-zA-Z0-9_]*)",
-            query,
-            re.IGNORECASE
-        )
-        table = match.group(1) if match else None
-
-        should_push : bool = query.upper().startswith("INSERT") or query.upper().startswith("UPDATE") or query.upper().startswith("DELETE") or query.upper().startswith("REPLACE")
-
-        if table and should_push:
-            await deliver(table, [dict(row) for row in rows], [dict(row) for row in rows])
-
-        elif not table:
-            return jsonify({"error" : "Could not fulfill push because the SQL query does not include a table."}), 400
-
-        res = [dict(row) for row in rows]
-
-        return jsonify(res), 200
-
-    except aiosqlite.OperationalError as ex:
-        return jsonify({"error" : ex.__str__()}), 400
-
 
 @app.route("/cache", methods = ["POST"])
 async def cache():
@@ -182,10 +140,17 @@ async def console():
     while True:
         line = await asyncio.to_thread(sys.stdin.readline)
 
+        if line == "":  # stdin closed
+            shutdown_event.set()
+            return
+
+        line = line.rstrip("\r\n")
+
         try:
-            await command.execute(line)
+            await execute_command(line)
         except Exception as ex:
             print(f"[red]Command failed: {ex}[/red]")
+
 
 
 app.register_blueprint(parties.party_blueprint)
@@ -205,4 +170,7 @@ if __name__ == "__main__":
 
     config.accesslog = None
 
-    asyncio.run(serve(app, config))
+    try:
+        asyncio.run(serve(app, config, shutdown_trigger = shutdown_event.wait))
+    except KeyboardInterrupt:
+        print("[yellow]KeyboardInterrupt detected! Repeat ^C to exit![/yellow]")

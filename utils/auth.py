@@ -31,8 +31,6 @@ async def authenticate_request(request : quart.app.Request):
     urlpath : str = request.path
     method : str = request.method
 
-    print(f"Authenticating {method} '{urlpath}' from '{identifier}' with {f"payload:\n{payload}" if len(payload) > 0 else "no body."}")
-
     if identifier is None:
         raise MissingHeadersException("\"X-Identifier\" is required for interacting with this service.")
 

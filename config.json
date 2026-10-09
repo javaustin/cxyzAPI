@@ -1,5 +1,5 @@
 {
-  "db-path" : "C:/Users/ayoung9/Documents/dev/cxyzAPI/server.db",
+  "db-path" : "./server.db",
 
   "quart-host" : "0.0.0.0",
   "quart-port" : 5000,
@@ -13,5 +13,14 @@
       "ip-address": "http://localhost:59152",
       "secret": "super-secret-key-2"
     }
-  }
+  },
+
+  "timezone" : "America/Los_Angeles",
+
+  "enabled-logs" : [
+    "REQUEST_SUCCESS",
+    "REQUEST_FAIL"
+  ],
+
+  "do-extended-logs" : false
 }

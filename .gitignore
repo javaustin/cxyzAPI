@@ -6,4 +6,5 @@ __pycache__/
 *.pyc
 /scripts/
 run.sh
+config.json
 server.db

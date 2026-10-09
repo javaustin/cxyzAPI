@@ -21,7 +21,7 @@ async def post_request(url : str, data : dict):
 
             signature = generate_signature(identifier = identifier, secret = secret, timestamp = timestamp, method = "POST", urlpath = urlpath, payload_json = payload)
 
-            print(f"[cyan]POST in progress:[/cyan] {url}")
+            print(f"POST in progress: {url}")
             result = await client.post(url, json = data, headers =
                     {
                     'Content-Type' : "application/json",
