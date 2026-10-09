@@ -1,11 +1,9 @@
 import json
-import re
 import sys
 
 from rich import print
 
 import app_instance
-import commands as cmds
 
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
@@ -15,7 +13,7 @@ import aiosqlite
 from quart import jsonify, request
 
 from app_instance import app
-from endpoints import partyExpires, parties, partyInvites, users, punishment, messages, friendRequests, gameStats
+from endpoints.models import friendRequests, punishment, partyExpires, messages, gameStats, partyInvites, parties, users
 from utils.config import quart_host, quart_port
 from utils.deliveries import DeliveryService, deliver
 from utils.errors import AuthenticationFailException, MissingHeadersException, DuplicateRequestException
@@ -23,6 +21,8 @@ from utils.tracking import preprocess_request, log_after_request
 from utils.servers import Server
 from utils.tasks import run_cache
 from utils.commands import execute_command
+
+from endpoints import cache, markoffline, seq
 
 shutdown_event = asyncio.Event()
 
@@ -62,22 +62,6 @@ async def after_request(response):
     await log_after_request(request, response)
 
     return response
-
-@app.route("/cache", methods = ["POST"])
-async def cache():
-
-    data = await request.get_json()
-
-    tables = data.get("tables")
-
-    if not tables:
-        tables = DeliveryService.tables_to_deliver
-    else:
-        tables = json.loads(tables)
-
-    asyncio.create_task(run_cache(tables))
-
-    return jsonify({"message" : "Operation successful"}), 200
 
 @app.route("/markOffline", methods = ["POST"])
 async def mark_offline():
@@ -151,8 +135,6 @@ async def console():
         except Exception as ex:
             print(f"[red]Command failed: {ex}[/red]")
 
-
-
 app.register_blueprint(parties.party_blueprint)
 app.register_blueprint(partyExpires.expire_blueprint)
 app.register_blueprint(partyInvites.invite_blueprint)
@@ -173,4 +155,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(serve(app, config, shutdown_trigger = shutdown_event.wait))
     except KeyboardInterrupt:
-        print("[yellow]KeyboardInterrupt detected! Repeat ^C to exit![/yellow]")
+        pass
