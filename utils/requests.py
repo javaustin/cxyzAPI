@@ -21,7 +21,7 @@ async def post_request(url : str, data : dict):
 
             signature = generate_signature(identifier = identifier, secret = secret, timestamp = timestamp, method = "POST", urlpath = urlpath, payload_json = payload)
 
-            print(f"POST in progress: {url}")
+            print(f"[cyan]POST in progress:[/cyan] [white]{url}[/white]")
             result = await client.post(url, json = data, headers =
                     {
                     'Content-Type' : "application/json",
@@ -33,12 +33,11 @@ async def post_request(url : str, data : dict):
                               )
 
 
-            if result.status_code != 200:
-                print(f"[yellow]POST COMPLETED ({result.status_code}) {url}.\n\tResponse: {json.dumps(result.json(), separators=(',', ':'))}[/yellow]")
+            if result.status_code < 200 or result.status_code >= 300:
+                print(f"[white]POST COMPLETED[/white] [yellow]({result.status_code})[/yellow] [white]{url}.[/white]\n\t[white]Response: {json.dumps(result.json(), separators=(',', ':'))}[/white]")
 
-            if result.status_code == 200:
-                print(f"[green]POST COMPLETED ({result.status_code}) {url}.\n\tResponse: {json.dumps(result.json(), separators=(',', ':'))}[/green]")
-
+            if 200 <= result.status_code < 300:
+                print(f"[white]POST COMPLETED[/white] [green]({result.status_code})[/green] [white]{url}.[/white]\n\t[white]Response: {json.dumps(result.json(), separators=(',', ':'))}[/white]")
 
             return None
 

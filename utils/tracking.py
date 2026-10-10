@@ -123,11 +123,11 @@ async def log_after_request(original_request : quart.app.Request, response : qua
     if not is_success and not enabled_logs.__contains__("REQUEST_FAIL"):
         return
 
-    print(f"[cyan][{ftime}][/cyan] [yellow]{original_request.method}[/yellow] [white]{original_request.path}[/white] request_id={request_id} identifier=[magenta]{identifier}[/magenta] [white]{original_request.remote_addr}[/white] {status_color}{status_code}{status_color.replace('[', '[/')}")
+    print(f"[magenta][{ftime}][/magenta] [yellow]{original_request.method}[/yellow] [white]{original_request.path}[/white] [white]request_id={request_id} identifier={identifier} {original_request.remote_addr}[/white] {status_color}{status_code}{status_color.replace('[', '[/')}")
 
     if not do_extended_logs:
         return
 
     if len(request_body) > 0:
-        print(f"\tBody: {request_body}")
-    print(f"\tResponse {status_color}({status_code}):{status_color.replace('[', '[/')} {response_body}")
+        print(f"\t[white]Body: {request_body}[/white]")
+    print(f"\t[white]Response[/white] {status_color}({status_code}):{status_color.replace('[', '[/')} [white]{response_body}[/white]")

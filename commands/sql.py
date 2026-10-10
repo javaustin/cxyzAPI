@@ -70,11 +70,11 @@ async def sql(args : list[str]) -> None:
                 return None
 
             else: # View the rows
-                print(res)
+                print("[white]res[/white]")
 
     except aiosqlite.OperationalError as ex:
         print(f"[red]Could not fulfill the SQL query because of the error:[/red] {ex}")
         return None
 
     except Exception as ex:
-        print(ex)
+        print(f"[red]{ex}[/red]")

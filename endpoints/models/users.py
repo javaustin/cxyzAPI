@@ -163,7 +163,7 @@ async def modify():
 
 
         if len(new_rows) == 0:
-            return jsonify({"error" : "No rows affected on SQL operation. Either the uuid is invalid or the object version is not synced."}), 404
+            return jsonify({"error" : "No rows affected on SQL operation. Either the provided uuid is invalid or the object version is older than the database record."}), 404
 
         await deliver("users", [dict(row) for row in new_rows], [])
 

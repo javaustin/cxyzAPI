@@ -22,5 +22,5 @@
     "REQUEST_FAIL"
   ],
 
-  "do-extended-logs" : false
+  "do-extended-logs" : true
 }
