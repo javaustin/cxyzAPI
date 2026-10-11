@@ -1,4 +1,5 @@
 import datetime
+import inspect
 import json
 import time
 from datetime import datetime
@@ -75,8 +76,8 @@ async def log_after_request(original_request : quart.app.Request, response : qua
     og_data = await original_request.get_data(as_text = True)
     request_body : str = og_data
 
-    response_data = await response.get_data(as_text = True)
-    response_body : str = response_data
+    result = response.get_data(as_text=True)
+    response_body = await result if inspect.isawaitable(result) else result
 
     db = app_instance.db
     async with app_instance.db_lock:

@@ -10,14 +10,12 @@ import asyncio
 from quart import jsonify, request
 
 from app_instance import app
-from endpoints.models import friendRequests, punishment, partyExpires, messages, gameStats, partyInvites, parties, users
 from utils.config import quart_host, quart_port
 from utils.errors import AuthenticationFailException, MissingHeadersException, DuplicateRequestException
 from utils.tracking import preprocess_request, log_after_request
 from utils.commands import execute_command
 
-# Do not delete this import
-from endpoints import cache, markoffline, seq
+from endpoints.models import friendRequests, punishment, messages, gameStats, partyInvites, parties, users
 
 shutdown_event = asyncio.Event()
 
@@ -74,7 +72,6 @@ async def console():
             print(f"[red]Command failed: {ex}[/red]")
 
 app.register_blueprint(parties.party_blueprint)
-app.register_blueprint(partyExpires.expire_blueprint)
 app.register_blueprint(partyInvites.invite_blueprint)
 app.register_blueprint(users.user_blueprint)
 app.register_blueprint(punishment.punishment_blueprint)

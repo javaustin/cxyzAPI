@@ -1,9 +1,9 @@
 import json
 
-class Server:
-    servers : list["Server"] = []
-    api : "Server" = None
+from utils.registry import ServerRegistry
 
+
+class Server:
 
     def __init__(self, identifier, ip, secret):
 
@@ -30,7 +30,7 @@ class Server:
                 if not all([identifier, ip, secret]):
                     continue
 
-                Server.servers.append(Server(identifier, ip, secret))
+                ServerRegistry.servers.append(Server(identifier, ip, secret))
 
     @staticmethod
     def load_api():
@@ -43,11 +43,11 @@ class Server:
             identifier = "API"
             secret = data[identifier]["secret"]
 
-            Server.api = Server(identifier, "0.0.0.0", secret)
+            ServerRegistry.api = Server(identifier, "0.0.0.0", secret)
 
     @staticmethod
     def get_server(identifier):
-        for server in Server.servers:
+        for server in ServerRegistry.servers:
             if server.identifier == identifier:
                 return server
 

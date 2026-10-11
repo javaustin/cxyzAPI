@@ -1,4 +1,5 @@
 import app_instance
+from utils.registry import ServerRegistry
 from utils.servers import Server
 from utils.requests import post_request
 
@@ -9,7 +10,6 @@ class DeliveryService:
         "messages",
         "users",
         "punishments",
-        "partyExpires",
         "partyInvites",
         "friendRequests",
         "gameStats"
@@ -27,7 +27,7 @@ async def ship(table : str = "users"):
             res = await cursor.fetchall()
             await cursor.close()
 
-        for server in Server.servers:
+        for server in ServerRegistry.servers:
             await post_request(f"{server.ip}/{table}Shipment", {"data" : [dict(row) for row in res]})
 
     except Exception as ex:
@@ -42,7 +42,7 @@ async def deliver(table : str, new_rows : list, old_rows : list):
     if len(new_data) == 0 and len(old_data) == 0:
         return None
 
-    for server in Server.servers:
+    for server in ServerRegistry.servers:
         await post_request(
             f"{server.ip}/{table}Delivery",
             {
