@@ -1,5 +1,5 @@
 {
-  "db-path" : "./server.db",
+  "db-path" : "server.db",
 
   "quart-host" : "0.0.0.0",
   "quart-port" : 5000,
