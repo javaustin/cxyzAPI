@@ -17,6 +17,8 @@ from utils.commands import execute_command
 
 from endpoints.models import friendRequests, punishment, messages, gameStats, partyInvites, parties, users
 
+import artifacts
+
 shutdown_event = asyncio.Event()
 
 def get(key : str):

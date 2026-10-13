@@ -1,0 +1,10 @@
+{
+  "revision" : 1,
+  "artifacts": [
+    {
+      "source" : "plugins/cxyz-0.0.jar",
+      "target" : "plugins/cxyz.jar",
+      "replace-existing" : true
+    }
+  ]
+}

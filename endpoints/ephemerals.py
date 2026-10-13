@@ -23,8 +23,6 @@ async def send_message():
         if game_server.identifier == api_server.identifier:
             continue
 
-        print("Attempting to POST to " + game_server.ip + f"/send_message with data: {og_data}")
-
         body, status = await post_request(
             game_server.ip + "/send_message",
             og_data,
