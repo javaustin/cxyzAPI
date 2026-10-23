@@ -2,8 +2,18 @@
   "revision" : 1,
   "artifacts": [
     {
-      "source" : "plugins/cxyz-0.0.jar",
-      "target" : "plugins/cxyz.jar",
+      "source" : "test1.txt",
+      "target" : "file/test1-copy.txt",
+      "replace-existing" : true
+    },
+    {
+      "source" : "my_folder/fake.jar",
+      "target" : "fake.jar",
+      "replace-existing" : true
+    },
+    {
+      "source" : "do-not-replace.txt",
+      "target" : "dont.txt",
       "replace-existing" : true
     }
   ]

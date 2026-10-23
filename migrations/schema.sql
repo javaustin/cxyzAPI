@@ -87,4 +87,4 @@ CREATE TABLE "users" (
 );
 
 CREATE TABLE "schema_version" ("key" TEXT, "value" INTEGER NOT NULL);
-INSERT INTO schema_version (key, value) VALUES ('version', 0);
+INSERT INTO schema_version (key, value) VALUES ('version', 1);

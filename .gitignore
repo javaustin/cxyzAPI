@@ -1,12 +1,9 @@
-/.idea/
+/.idea
 /__pycache__/
-.gitignore
 server.db
 server.db*
 __pycache__/
 *.pyc
 /scripts/
-run.sh
-config.json
 *.env
-run.bat
+run.*
