@@ -9,3 +9,4 @@ __pycache__/
 run.sh
 config.json
 *.env
+run.bat

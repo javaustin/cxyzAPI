@@ -37,6 +37,7 @@ CREATE TABLE "punishments" (
 	"enforced"	BOOLEAN,
 	"editorModUsername"	VARCHAR(64),
 	"editorModUUID"	VARCHAR(64),
+	"silent" BOOLEAN,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 

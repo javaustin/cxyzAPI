@@ -1,0 +1,1 @@
+ALTER TABLE punishments ADD COLUMN "silent" BOOLEAN;

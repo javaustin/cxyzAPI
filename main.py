@@ -17,7 +17,9 @@ from utils.commands import execute_command
 
 from endpoints.models import friendRequests, punishment, messages, gameStats, partyInvites, parties, users
 
+# Do not delete these imports or these things will silently fail
 import artifacts
+import commands
 
 shutdown_event = asyncio.Event()
 
