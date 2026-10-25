@@ -46,7 +46,7 @@ async def preprocess():
         return jsonify({"error": str(ex)}), 401
 
     except AuthenticationFailException as ex:
-        print(f"[red]Authentication failed for the above request! Reason: {ex}[/red]")
+        print(f"[red]Authentication failed for the below request! Reason: {ex}[/red]")
         return jsonify({"error" : str(ex)}), 403
 
     except DuplicateRequestException as ex:

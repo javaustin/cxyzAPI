@@ -29,4 +29,4 @@ async def get_manifest():
     except FileNotFoundError:
         return {"error" : "Manifest not found!"}, 404
 
-    return jsonify(json.dumps(json_data)), 200
+    return jsonify(json_data), 200

@@ -2,7 +2,7 @@
   "revision" : 1,
   "artifacts": [
     {
-      "source" : "test1.txt",
+      "source" : "test-1.txt",
       "target" : "file/test1-copy.txt",
       "replace-existing" : true
     },
