@@ -7,7 +7,7 @@ from utils.deliveries import deliver
 from utils.servers import Server
 
 
-@app.route("/markOffline", methods = ["POST"])
+@app.route("/mark_offline", methods = ["POST"])
 async def mark_offline():
     data = await request.get_json()
 
