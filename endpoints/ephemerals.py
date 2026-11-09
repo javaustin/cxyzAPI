@@ -23,8 +23,8 @@ async def send_message():
         if game_server.identifier == api_server.identifier:
             continue
 
-        if game_server.identifier == request.headers.get("X-Identifier"):
-            continue
+        # if game_server.identifier == request.headers.get("X-Identifier"):
+        #     continue
 
         body, status = await post_request(
             game_server.ip + "/send_message",
